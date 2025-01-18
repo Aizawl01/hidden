@@ -5,7 +5,85 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khiangtevillain AI: Hidden Word Challenge</title>
     <style>
-        /* (Other CSS styles remain the same) */
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Header Styling */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 10px 0;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            color: #FF00FF;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF;
+        }
+
+        /* Counter Styling */
+        .counter {
+            position: fixed;
+            top: 60px;
+            width: 100%;
+            text-align: center;
+            color: #00FFFF;
+            font-size: 1.4rem;
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
+            z-index: 2;
+        }
+
+        /* Instructions Styling */
+        .instructions {
+            position: fixed;
+            top: 100px;
+            width: 100%;
+            text-align: center;
+            color: #FFF;
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px #FF00FF;
+            z-index: 2;
+        }
+
+        /* Reveal Button Styling */
+        #reveal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            background: linear-gradient(90deg, #FF00FF, #00FFFF);
+            color: #000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 2;
+            text-shadow: none;
+            box-shadow: 0 0 15px #FF00FF;
+        }
+
+        #reveal:hover {
+            background: linear-gradient(90deg, #00FFFF, #FF00FF);
+            color: #FFF;
+        }
+
+        /* Matrix Animation Canvas */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
 
         /* Marquee Transition */
         .marquee {
@@ -37,19 +115,6 @@
                 opacity: 0.4;
             }
         }
-
-        /* Optional: Fine-tune font size with media queries */
-        @media (max-width: 768px) {
-            .marquee h1 {
-                font-size: 8vw; /* Smaller font size for mobile */
-            }
-        }
-
-        @media (min-width: 769px) {
-            .marquee h1 {
-                font-size: 5rem; /* Larger font size for desktop */
-            }
-        }
     </style>
 </head>
 <body>
@@ -79,7 +144,127 @@
     </div>
 
     <script>
-        // (JavaScript code remains the same)
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        const marquee = document.getElementById('marquee');
+        const revealButton = document.getElementById('reveal');
+        const audio = new Audio('aizawl.mp3');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const fontSize = 18;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = Array(columns).fill(1);
+
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        const hiddenWords = ["aijal", "downtown", "Acity", "khiangtevillain ai", "aizawl echo"];
+        let foundWords = 0;
+        const foundList = [];
+
+        const hiddenWordPositions = hiddenWords.map((word) => ({
+            word,
+            column: Math.floor(Math.random() * columns),
+            y: Math.random() * canvas.height,
+            found: false,
+        }));
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `${fontSize}px monospace`;
+
+            // Draw falling characters
+            drops.forEach((y, x) => {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                const neonColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
+
+                ctx.fillStyle = neonColor;
+                ctx.shadowColor = neonColor;
+                ctx.shadowBlur = 15;
+
+                ctx.fillText(text, x * fontSize, y * fontSize);
+
+                if (y * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[x] = 0;
+                }
+
+                drops[x]++;
+            });
+
+            // Draw hidden words only if marquee is not displayed
+            if (marquee.style.display !== "flex") {
+                hiddenWordPositions.forEach((hw) => {
+                    if (!hw.found) {
+                        ctx.fillStyle = "#FF00FF";
+                        ctx.shadowColor = "#FF00FF";
+                        ctx.shadowBlur = 15;
+
+                        ctx.fillText(hw.word, hw.column * fontSize, hw.y);
+                        hw.y += fontSize / 2;
+
+                        if (hw.y > canvas.height) {
+                            hw.y = 0;
+                            hw.column = Math.floor(Math.random() * columns);
+                        }
+                    }
+                });
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+
+        // Detect clicks or taps on the canvas
+        canvas.addEventListener("click", (e) => {
+            const clickedX = e.clientX;
+            const clickedY = e.clientY;
+
+            hiddenWordPositions.forEach((hw) => {
+                if (
+                    !hw.found &&
+                    Math.abs(hw.column * fontSize - clickedX) < fontSize * 4 &&
+                    Math.abs(hw.y - clickedY) < fontSize * 2
+                ) {
+                    hw.found = true;
+                    foundWords++;
+                    foundList.push(hw.word);
+
+                    document.getElementById("foundCount").textContent = foundWords;
+                    document.getElementById("foundWords").textContent = foundList.join(", ");
+
+                    if (foundWords === hiddenWords.length) {
+                        revealButton.style.display = "block";
+                    }
+                }
+            });
+        });
+
+        // Reveal Button Functionality
+        revealButton.addEventListener('click', () => {
+            // Show marquee and play audio
+            marquee.style.display = "flex";
+            audio.play().catch((error) => {
+                console.error('Audio playback failed:', error);
+            });
+
+            // Hide marquee after 5 seconds and show instructions
+            setTimeout(() => {
+                marquee.style.display = "none";
+                alert(`
+ Congratulations! You found all the hidden words: ${foundList.join(", ")}!
+
+ Next Step:
+ Return to the Aizawl Echo music video on YouTube (link).
+ Search for the scenes where these hidden words appear.
+ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.
+ Include your name, WhatsApp number, and GPay number.
+
+ Winners:
+If multiple entries are received, we’ll conduct a lucky draw!
+
+Good luck, and thank you for playing! 
+                `);
+            }, 5000); // 5 seconds delay
+        });
     </script>
 </body>
 </html>
