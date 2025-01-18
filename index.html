@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyberpunk Falling Words</title>
+    <title>Accessible Falling Words</title>
     <style>
         body {
             margin: 0;
@@ -71,7 +71,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: -1; /* Place behind the content */
+            z-index: -1;
         }
     </style>
 </head>
@@ -84,7 +84,7 @@
 
     <!-- Instructions -->
     <div class="instructions">
-        Tap or click on the glowing words as they fall! Find all 5 hidden words to win. <br>
+        Tap or click on the glowing words as they fall! The area around words is forgiving, so aim close. <br>
         Hidden words glow in <span style="color: #FF00FF;">magenta</span>.
     </div>
     
@@ -111,7 +111,7 @@
 
         const hiddenWordPositions = [];
 
-        // Randomly assign hidden words to certain columns
+        // Assign hidden words to certain columns
         hiddenWords.forEach((word) => {
             const column = Math.floor(Math.random() * columns);
             hiddenWordPositions.push({ word, column, y: 0, found: false });
@@ -164,7 +164,7 @@
                 if (
                     !hw.found &&
                     hw.column === clickedX &&
-                    Math.abs(hw.y - clickedY) < fontSize * 2 // Increase hitbox size
+                    Math.abs(hw.y - clickedY) < fontSize * 3 // Very forgiving hitbox
                 ) {
                     hw.found = true;
                     foundWords++;
@@ -173,6 +173,10 @@
                     // Update the counter and word list
                     document.getElementById("foundCount").textContent = foundWords;
                     document.getElementById("foundWords").textContent = foundList.join(", ");
+
+                    // Highlight clicked word visually
+                    ctx.fillStyle = "#FFF";
+                    ctx.fillText(hw.word, hw.column * fontSize, hw.y);
 
                     // Show the reveal button when all words are found
                     if (foundWords === hiddenWords.length) {
