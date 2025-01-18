@@ -7,7 +7,7 @@
     <style>
         body {
             margin: 0;
-            background: #000; /* Deep black background for contrast */
+            background: #000;
             color: #fff;
             font-family: monospace;
             overflow: hidden;
@@ -53,7 +53,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: -1; /* Place behind the content */
+            z-index: -1;
         }
     </style>
 </head>
@@ -81,39 +81,43 @@
         const hiddenWords = ["aijal", "downtown", "Acity", "khiangtevillain ai", "aizawl echo"];
         let foundWords = 0;
 
-        const hiddenWordPositions = new Map();
+        // Array to store the positions of hidden words for click detection
+        const hiddenWordPositions = [];
 
-        // Randomly assign hidden words to certain columns and rows
-        hiddenWords.forEach((word, index) => {
+        // Randomly assign hidden words to certain columns
+        hiddenWords.forEach((word) => {
             const column = Math.floor(Math.random() * columns);
-            hiddenWordPositions.set(column, { word, found: false });
+            hiddenWordPositions.push({ word, column, y: 0, found: false });
         });
 
         function drawMatrix() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             ctx.font = `${fontSize}px monospace`;
 
             drops.forEach((y, x) => {
-                const isHiddenWord = hiddenWordPositions.has(x) && !hiddenWordPositions.get(x).found;
+                const isHiddenWord = hiddenWordPositions.find(
+                    (hw) => hw.column === x && !hw.found
+                );
+
                 const text = isHiddenWord
-                    ? hiddenWordPositions.get(x).word
+                    ? isHiddenWord.word
                     : chars[Math.floor(Math.random() * chars.length)];
 
                 const neonColor = isHiddenWord ? "#FF00FF" : `hsl(${Math.random() * 360}, 100%, 75%)`;
-                
+
                 ctx.fillStyle = neonColor;
                 ctx.shadowColor = neonColor;
                 ctx.shadowBlur = 15;
 
                 ctx.fillText(text, x * fontSize, y * fontSize);
 
-                // Store hidden word's coordinates for click detection
+                // Update the y position of the hidden word
                 if (isHiddenWord) {
-                    hiddenWordPositions.get(x).y = y * fontSize;
+                    isHiddenWord.y = y * fontSize;
                 }
 
+                // Reset drops that go off-screen
                 if (y * fontSize > canvas.height && Math.random() > 0.975) {
                     drops[x] = 0;
                 }
@@ -124,25 +128,26 @@
 
         setInterval(drawMatrix, 50);
 
-        // Add click interaction to find hidden words
+        // Detect clicks or taps on the canvas
         canvas.addEventListener("click", (e) => {
             const clickedX = Math.floor(e.clientX / fontSize);
             const clickedY = e.clientY;
 
-            if (hiddenWordPositions.has(clickedX)) {
-                const { y, word, found } = hiddenWordPositions.get(clickedX);
-
-                if (!found && Math.abs(clickedY - y) < fontSize) {
+            hiddenWordPositions.forEach((hw) => {
+                if (
+                    !hw.found &&
+                    hw.column === clickedX &&
+                    Math.abs(hw.y - clickedY) < fontSize
+                ) {
+                    hw.found = true;
                     foundWords++;
-                    hiddenWordPositions.get(clickedX).found = true;
                     document.getElementById("foundCount").textContent = foundWords;
 
-                    // If all words are found, show the reveal button
                     if (foundWords === hiddenWords.length) {
                         document.getElementById("reveal").style.display = "block";
                     }
                 }
-            }
+            });
         });
     </script>
 </body>
