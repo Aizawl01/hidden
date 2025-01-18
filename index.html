@@ -3,43 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Falling Words</title>
+    <title>Khiangtevillain AI: Hidden Word Challenge</title>
     <style>
         body {
             margin: 0;
             background: #000;
             color: #fff;
-            font-family: monospace;
+            font-family: Arial, sans-serif;
             overflow: hidden;
+        }
+
+        /* Header Styling */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 10px 0;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            color: #FF00FF;
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF;
         }
 
         /* Counter Styling */
         .counter {
             position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #FF00FF; /* Neon magenta */
-            font-size: 1.5rem;
-            text-shadow: 0 0 10px #FF00FF;
+            top: 60px;
+            width: 100%;
             text-align: center;
+            color: #00FFFF;
+            font-size: 1.4rem;
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
+            z-index: 2;
         }
 
-        .counter span {
-            color: #00FFFF; /* Cyan for found words */
-        }
-
-        /* Instructions */
+        /* Instructions Styling */
         .instructions {
             position: fixed;
-            top: 50px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #FFF;
-            text-shadow: 0 0 5px #FF00FF;
-            font-size: 1.2rem;
+            top: 100px;
+            width: 100%;
             text-align: center;
-            max-width: 90%;
+            color: #FFF;
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px #FF00FF;
+            z-index: 2;
         }
 
         /* Reveal Button Styling */
@@ -50,9 +60,10 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 15px 30px;
-            background: linear-gradient(90deg, #FF00FF, #00FFFF); /* Magenta to Cyan */
+            background: linear-gradient(90deg, #FF00FF, #00FFFF);
             color: #000;
             font-size: 1.2rem;
+            font-weight: bold;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -62,7 +73,7 @@
         }
 
         #reveal:hover {
-            background: linear-gradient(90deg, #00FFFF, #FF00FF); /* Reverse gradient */
+            background: linear-gradient(90deg, #00FFFF, #FF00FF);
             color: #FFF;
         }
 
@@ -76,20 +87,22 @@
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <header>Khiangtevillain AI: Hidden Word Challenge</header>
+
     <!-- Counter -->
     <div class="counter">
-        Found <span id="foundCount">0</span>/5<br>
+        Found: <span id="foundCount">0</span>/5<br>
         Words: <span id="foundWords">None yet</span>
     </div>
 
     <!-- Instructions -->
     <div class="instructions">
-        Tap or click on the glowing words as they fall! The hidden words move when clicked.<br>
-        Hidden words glow in <span style="color: #FF00FF;">magenta</span>.
+        Tap or click the glowing hidden words as they fall! Once all words are found, click "Reveal" to see how to submit your entry.
     </div>
     
     <!-- Reveal Button -->
-    <button id="reveal">Click to Reveal</button>
+    <button id="reveal">Reveal Instructions</button>
     
     <!-- Matrix Animation Canvas -->
     <canvas id="matrix"></canvas>
@@ -109,7 +122,7 @@
         let foundWords = 0;
         const foundList = [];
 
-        // Assign hidden words with random positions
+        // Assign hidden words to random positions
         const hiddenWordPositions = hiddenWords.map((word) => ({
             word,
             column: Math.floor(Math.random() * columns),
@@ -182,16 +195,30 @@
                     document.getElementById("foundCount").textContent = foundWords;
                     document.getElementById("foundWords").textContent = foundList.join(", ");
 
-                    // Move the word to a new random position
-                    hw.y = Math.random() * canvas.height;
-                    hw.column = Math.floor(Math.random() * columns);
-
                     // Show the reveal button when all words are found
                     if (foundWords === hiddenWords.length) {
                         document.getElementById("reveal").style.display = "block";
                     }
                 }
             });
+        });
+
+        // Reveal Button Functionality
+        const revealButton = document.getElementById('reveal');
+        revealButton.addEventListener('click', () => {
+            alert(`
+Congratulations! You found all the hidden words!
+
+📜 Here's how to submit your entry:
+1️⃣ Take a screenshot of this game showing all the hidden words.
+2️⃣ Post the screenshot to the Khiangtevillain AI Telegram channel.
+3️⃣ Include your name, WhatsApp number, and GPay number in your post.
+
+🎁 Winners:
+- If multiple people submit, a lucky draw will decide the winner.
+
+Good luck, and thank you for playing!
+            `);
         });
     </script>
 </body>
