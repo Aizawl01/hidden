@@ -77,9 +77,17 @@
             color: #FFF;
         }
 
+        /* Matrix Animation Canvas */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
         /* Marquee Transition */
         .marquee {
-            display: none;
+            display: none; /* Hidden by default */
             position: absolute;
             top: 0;
             left: 0;
@@ -89,7 +97,6 @@
             color: #FFF;
             font-size: 5rem;
             text-shadow: 0 0 20px #FFF, 0 0 40px #00FFFF, 0 0 60px #FF00FF;
-            display: flex;
             justify-content: center;
             align-items: center;
             z-index: 3;
@@ -121,8 +128,7 @@
 
     <!-- Instructions -->
     <div class="instructions">
-        Tap or click the glowing hidden words as they fall! The hidden words move when clicked.<br>
-        Find all words and click "Reveal" for the next step.
+        Tap or click the glowing hidden words as they fall! Once all words are found, click "Reveal" to see how to submit your entry.
     </div>
     
     <!-- Reveal Button -->
@@ -166,6 +172,7 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.font = `${fontSize}px monospace`;
 
+            // Draw falling characters
             drops.forEach((y, x) => {
                 const text = chars[Math.floor(Math.random() * chars.length)];
                 const neonColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
@@ -183,25 +190,29 @@
                 drops[x]++;
             });
 
-            hiddenWordPositions.forEach((hw) => {
-                if (!hw.found) {
-                    ctx.fillStyle = "#FF00FF";
-                    ctx.shadowColor = "#FF00FF";
-                    ctx.shadowBlur = 15;
+            // Draw hidden words only if marquee is not displayed
+            if (marquee.style.display !== "flex") {
+                hiddenWordPositions.forEach((hw) => {
+                    if (!hw.found) {
+                        ctx.fillStyle = "#FF00FF";
+                        ctx.shadowColor = "#FF00FF";
+                        ctx.shadowBlur = 15;
 
-                    ctx.fillText(hw.word, hw.column * fontSize, hw.y);
-                    hw.y += fontSize / 2;
+                        ctx.fillText(hw.word, hw.column * fontSize, hw.y);
+                        hw.y += fontSize / 2;
 
-                    if (hw.y > canvas.height) {
-                        hw.y = 0;
-                        hw.column = Math.floor(Math.random() * columns);
+                        if (hw.y > canvas.height) {
+                            hw.y = 0;
+                            hw.column = Math.floor(Math.random() * columns);
+                        }
                     }
-                }
-            });
+                });
+            }
         }
 
         setInterval(drawMatrix, 50);
 
+        // Detect clicks or taps on the canvas
         canvas.addEventListener("click", (e) => {
             const clickedX = e.clientX;
             const clickedY = e.clientY;
@@ -226,26 +237,30 @@
             });
         });
 
+        // Reveal Button Functionality
         revealButton.addEventListener('click', () => {
+            // Show marquee and play audio
             marquee.style.display = "flex";
             audio.play();
+
+            // Hide marquee after 5 seconds and show instructions
             setTimeout(() => {
                 marquee.style.display = "none";
                 alert(`
  Congratulations! You found all the hidden words: ${foundList.join(", ")}!
 
-\ud83d\udd1c Next Step:
-1\ufe0f\u20e3 Return to the Aizawl Echo music video on YouTube (link).
-2\ufe0f\u20e3 Search for the scenes where these hidden words appear.
-3\ufe0f\u20e3 Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.
-4\ufe0f\u20e3 Include your name, WhatsApp number, and GPay number.
+ Next Step:
+ Return to the Aizawl Echo music video on YouTube (link).
+ Search for the scenes where these hidden words appear.
+ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.
+ Include your name, WhatsApp number, and GPay number.
 
-\ud83c\udf81 Winners:
+ Winners:
 If multiple entries are received, we’ll conduct a lucky draw!
 
-Good luck, and thank you for playing! \ud83d\ude80
+Good luck, and thank you for playing! 
                 `);
-            }, 5000);
+            }, 5000); // 5 seconds delay
         });
     </script>
 </body>
