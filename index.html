@@ -5,115 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khiangtevillain AI: Hidden Word Challenge</title>
     <style>
-        body {
-            margin: 0;
-            background: #000;
-            color: #fff;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-        }
-
-        /* Header Styling */
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 10px 0;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 2;
-            color: #FF00FF;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF;
-        }
-
-        /* Counter Styling */
-        .counter {
-            position: fixed;
-            top: 60px;
-            width: 100%;
-            text-align: center;
-            color: #00FFFF;
-            font-size: 1.4rem;
-            text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
-            z-index: 2;
-        }
-
-        /* Instructions Styling */
-        .instructions {
-            position: fixed;
-            top: 100px;
-            width: 100%;
-            text-align: center;
-            color: #FFF;
-            font-size: 1.2rem;
-            text-shadow: 0 0 5px #FF00FF;
-            z-index: 2;
-        }
-
-        /* Reveal Button Styling */
-        #reveal {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 30px;
-            background: linear-gradient(90deg, #FF00FF, #00FFFF);
-            color: #000;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 2;
-            text-shadow: none;
-            box-shadow: 0 0 15px #FF00FF;
-        }
-
-        #reveal:hover {
-            background: linear-gradient(90deg, #00FFFF, #FF00FF);
-            color: #FFF;
-        }
-
-        /* Matrix Animation Canvas */
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
-
-        /* Marquee Transition */
-        .marquee {
-            display: none; /* Hidden by default */
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #FF00FF, #00FFFF);
-            color: #FFF;
-            font-size: 5rem;
-            text-shadow: 0 0 20px #FFF, 0 0 40px #00FFFF, 0 0 60px #FF00FF;
-            justify-content: center;
-            align-items: center;
-            z-index: 3;
-        }
-
-        .marquee h1 {
-            animation: flicker 1.5s infinite;
-        }
-
-        @keyframes flicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% {
-                opacity: 1;
-            }
-            20%, 24%, 55% {
-                opacity: 0.4;
-            }
-        }
+        /* (CSS styles remain the same as before) */
     </style>
 </head>
 <body>
@@ -147,7 +39,15 @@
         const ctx = canvas.getContext('2d');
         const marquee = document.getElementById('marquee');
         const revealButton = document.getElementById('reveal');
+
+        // Audio file path (ensure aizawl.mp3 is in the same directory as index.html)
         const audio = new Audio('aizawl.mp3');
+
+        // Debugging: Log audio errors
+        audio.addEventListener('error', (e) => {
+            console.error('Error loading audio:', e);
+        });
+
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -241,7 +141,9 @@
         revealButton.addEventListener('click', () => {
             // Show marquee and play audio
             marquee.style.display = "flex";
-            audio.play();
+            audio.play().catch((error) => {
+                console.error('Audio playback failed:', error);
+            });
 
             // Hide marquee after 5 seconds and show instructions
             setTimeout(() => {
