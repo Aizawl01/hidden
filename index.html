@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accessible Falling Words</title>
+    <title>Dynamic Falling Words</title>
     <style>
         body {
             margin: 0;
@@ -84,7 +84,7 @@
 
     <!-- Instructions -->
     <div class="instructions">
-        Tap or click on the glowing words as they fall! Words can be clicked even if you're near them.<br>
+        Tap or click on the glowing words as they fall! The hidden words move when clicked.<br>
         Hidden words glow in <span style="color: #FF00FF;">magenta</span>.
     </div>
     
@@ -109,11 +109,11 @@
         let foundWords = 0;
         const foundList = [];
 
-        // Assign hidden words to random positions
+        // Assign hidden words with random positions
         const hiddenWordPositions = hiddenWords.map((word) => ({
             word,
-            x: Math.floor(Math.random() * columns) * fontSize, // X-coordinate
-            y: Math.random() * canvas.height, // Random Y-coordinate
+            column: Math.floor(Math.random() * columns),
+            y: Math.random() * canvas.height,
             found: false,
         }));
 
@@ -147,7 +147,16 @@
                     ctx.shadowColor = "#FF00FF";
                     ctx.shadowBlur = 15;
 
-                    ctx.fillText(hw.word, hw.x, hw.y);
+                    ctx.fillText(hw.word, hw.column * fontSize, hw.y);
+
+                    // Move the word down
+                    hw.y += fontSize / 2;
+
+                    // Reset position when it falls off-screen
+                    if (hw.y > canvas.height) {
+                        hw.y = 0;
+                        hw.column = Math.floor(Math.random() * columns);
+                    }
                 }
             });
         }
@@ -162,7 +171,7 @@
             hiddenWordPositions.forEach((hw) => {
                 if (
                     !hw.found &&
-                    Math.abs(hw.x - clickedX) < fontSize * 4 && // Forgiving hitbox
+                    Math.abs(hw.column * fontSize - clickedX) < fontSize * 4 && // Forgiving hitbox
                     Math.abs(hw.y - clickedY) < fontSize * 2
                 ) {
                     hw.found = true;
@@ -172,6 +181,10 @@
                     // Update the counter and word list
                     document.getElementById("foundCount").textContent = foundWords;
                     document.getElementById("foundWords").textContent = foundList.join(", ");
+
+                    // Move the word to a new random position
+                    hw.y = Math.random() * canvas.height;
+                    hw.column = Math.floor(Math.random() * columns);
 
                     // Show the reveal button when all words are found
                     if (foundWords === hiddenWords.length) {
