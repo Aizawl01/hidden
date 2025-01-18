@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyberpunk Falling Words</title>
     <style>
-        /* General Styling */
         body {
             margin: 0;
             background: #000; /* Deep black background for contrast */
@@ -74,7 +73,6 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Falling characters settings
         const fontSize = 18;
         const columns = Math.floor(canvas.width / fontSize);
         const drops = Array(columns).fill(1);
@@ -83,7 +81,6 @@
         const hiddenWords = ["aijal", "downtown", "Acity", "khiangtevillain ai", "aizawl echo"];
         let foundWords = 0;
 
-        // Randomly assign hidden words to certain columns
         const hiddenWordIndexes = new Set(
             Array.from({ length: hiddenWords.length }, () =>
                 Math.floor(Math.random() * columns)
@@ -91,35 +88,33 @@
         );
 
         function drawMatrix() {
-            // Clear the canvas with a fading effect
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             ctx.font = `${fontSize}px monospace`;
 
             drops.forEach((y, x) => {
-                // Determine if this column has a hidden word
                 const isHiddenWord = hiddenWordIndexes.has(x);
-
-                // Select the text to display
                 const text = isHiddenWord
                     ? hiddenWords[Array.from(hiddenWordIndexes).indexOf(x)]
                     : chars[Math.floor(Math.random() * chars.length)];
 
-                // Set color based on whether it's a hidden word
-                ctx.fillStyle = isHiddenWord
-                    ? "#FF00FF" /* Magenta for hidden words */
-                    : `hsl(${Math.random() * 360}, 100%, 75%)`; /* Random neon hue for falling chars */
+                const neonColor = isHiddenWord ? "#FF00FF" : `hsl(${Math.random() * 360}, 100%, 75%)`;
+                const glow = `0 0 5px ${neonColor}, 0 0 10px ${neonColor}, 0 0 20px ${neonColor}`;
+                
+                // Set glow effect
+                ctx.fillStyle = neonColor;
+                ctx.shadowColor = neonColor;
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
 
-                // Draw the text
                 ctx.fillText(text, x * fontSize, y * fontSize);
 
-                // Reset drops that go off-screen
                 if (y * fontSize > canvas.height && Math.random() > 0.975) {
                     drops[x] = 0;
                 }
 
-                // Remove hidden word if it goes off-screen
                 if (isHiddenWord && y * fontSize > canvas.height) {
                     hiddenWordIndexes.delete(x);
                 }
@@ -130,18 +125,14 @@
 
         setInterval(drawMatrix, 50);
 
-        // Add click interaction to find hidden words
         document.addEventListener("click", (e) => {
             const clickedColumn = Math.floor(e.clientX / fontSize);
 
             if (hiddenWordIndexes.has(clickedColumn)) {
                 foundWords++;
                 hiddenWordIndexes.delete(clickedColumn);
-
-                // Update the counter
                 document.getElementById("foundCount").textContent = foundWords;
 
-                // If all words are found, show the reveal button
                 if (foundWords === hiddenWords.length) {
                     document.getElementById("reveal").style.display = "block";
                 }
