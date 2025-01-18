@@ -22,6 +22,24 @@
             color: #FF00FF; /* Neon magenta */
             font-size: 1.5rem;
             text-shadow: 0 0 10px #FF00FF;
+            text-align: center;
+        }
+
+        .counter span {
+            color: #00FFFF; /* Cyan for found words */
+        }
+
+        /* Instructions */
+        .instructions {
+            position: fixed;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #FFF;
+            text-shadow: 0 0 5px #FF00FF;
+            font-size: 1.2rem;
+            text-align: center;
+            max-width: 90%;
         }
 
         /* Reveal Button Styling */
@@ -53,13 +71,22 @@
             position: absolute;
             top: 0;
             left: 0;
-            z-index: -1;
+            z-index: -1; /* Place behind the content */
         }
     </style>
 </head>
 <body>
     <!-- Counter -->
-    <div class="counter">Words Found: <span id="foundCount">0</span>/5</div>
+    <div class="counter">
+        Found <span id="foundCount">0</span>/5<br>
+        Words: <span id="foundWords">None yet</span>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+        Tap or click on the glowing words as they fall! Find all 5 hidden words to win. <br>
+        Hidden words glow in <span style="color: #FF00FF;">magenta</span>.
+    </div>
     
     <!-- Reveal Button -->
     <button id="reveal">Click to Reveal</button>
@@ -80,8 +107,8 @@
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
         const hiddenWords = ["aijal", "downtown", "Acity", "khiangtevillain ai", "aizawl echo"];
         let foundWords = 0;
+        const foundList = [];
 
-        // Array to store the positions of hidden words for click detection
         const hiddenWordPositions = [];
 
         // Randomly assign hidden words to certain columns
@@ -137,12 +164,17 @@
                 if (
                     !hw.found &&
                     hw.column === clickedX &&
-                    Math.abs(hw.y - clickedY) < fontSize
+                    Math.abs(hw.y - clickedY) < fontSize * 2 // Increase hitbox size
                 ) {
                     hw.found = true;
                     foundWords++;
-                    document.getElementById("foundCount").textContent = foundWords;
+                    foundList.push(hw.word);
 
+                    // Update the counter and word list
+                    document.getElementById("foundCount").textContent = foundWords;
+                    document.getElementById("foundWords").textContent = foundList.join(", ");
+
+                    // Show the reveal button when all words are found
                     if (foundWords === hiddenWords.length) {
                         document.getElementById("reveal").style.display = "block";
                     }
