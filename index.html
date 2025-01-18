@@ -84,7 +84,7 @@
 
     <!-- Instructions -->
     <div class="instructions">
-        Tap or click on the glowing words as they fall! The area around words is forgiving, so aim close. <br>
+        Tap or click on the glowing words as they fall! Words will pause when you hover over them.<br>
         Hidden words glow in <span style="color: #FF00FF;">magenta</span>.
     </div>
     
@@ -114,7 +114,7 @@
         // Assign hidden words to certain columns
         hiddenWords.forEach((word) => {
             const column = Math.floor(Math.random() * columns);
-            hiddenWordPositions.push({ word, column, y: 0, found: false });
+            hiddenWordPositions.push({ word, column, y: 0, found: false, paused: false });
         });
 
         function drawMatrix() {
@@ -137,10 +137,11 @@
                 ctx.shadowColor = neonColor;
                 ctx.shadowBlur = 15;
 
+                // Draw the word
                 ctx.fillText(text, x * fontSize, y * fontSize);
 
-                // Update the y position of the hidden word
-                if (isHiddenWord) {
+                // Handle hidden word movement
+                if (isHiddenWord && !isHiddenWord.paused) {
                     isHiddenWord.y = y * fontSize;
                 }
 
@@ -164,9 +165,10 @@
                 if (
                     !hw.found &&
                     hw.column === clickedX &&
-                    Math.abs(hw.y - clickedY) < fontSize * 3 // Very forgiving hitbox
+                    Math.abs(hw.y - clickedY) < fontSize * 3 // Forgiving hitbox
                 ) {
                     hw.found = true;
+                    hw.paused = true; // Stop the word from moving
                     foundWords++;
                     foundList.push(hw.word);
 
