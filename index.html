@@ -84,7 +84,7 @@
 
     <!-- Instructions -->
     <div class="instructions">
-        Tap or click on the glowing words as they fall! Words will pause when you hover over them.<br>
+        Tap or click on the glowing words as they fall! Words can be clicked even if you're near them.<br>
         Hidden words glow in <span style="color: #FF00FF;">magenta</span>.
     </div>
     
@@ -109,48 +109,46 @@
         let foundWords = 0;
         const foundList = [];
 
-        const hiddenWordPositions = [];
-
-        // Assign hidden words to certain columns
-        hiddenWords.forEach((word) => {
-            const column = Math.floor(Math.random() * columns);
-            hiddenWordPositions.push({ word, column, y: 0, found: false, paused: false });
-        });
+        // Assign hidden words to random positions
+        const hiddenWordPositions = hiddenWords.map((word) => ({
+            word,
+            x: Math.floor(Math.random() * columns) * fontSize, // X-coordinate
+            y: Math.random() * canvas.height, // Random Y-coordinate
+            found: false,
+        }));
 
         function drawMatrix() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.font = `${fontSize}px monospace`;
 
+            // Draw falling characters
             drops.forEach((y, x) => {
-                const isHiddenWord = hiddenWordPositions.find(
-                    (hw) => hw.column === x && !hw.found
-                );
-
-                const text = isHiddenWord
-                    ? isHiddenWord.word
-                    : chars[Math.floor(Math.random() * chars.length)];
-
-                const neonColor = isHiddenWord ? "#FF00FF" : `hsl(${Math.random() * 360}, 100%, 75%)`;
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                const neonColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
 
                 ctx.fillStyle = neonColor;
                 ctx.shadowColor = neonColor;
                 ctx.shadowBlur = 15;
 
-                // Draw the word
                 ctx.fillText(text, x * fontSize, y * fontSize);
 
-                // Handle hidden word movement
-                if (isHiddenWord && !isHiddenWord.paused) {
-                    isHiddenWord.y = y * fontSize;
-                }
-
-                // Reset drops that go off-screen
                 if (y * fontSize > canvas.height && Math.random() > 0.975) {
                     drops[x] = 0;
                 }
 
                 drops[x]++;
+            });
+
+            // Draw hidden words
+            hiddenWordPositions.forEach((hw) => {
+                if (!hw.found) {
+                    ctx.fillStyle = "#FF00FF";
+                    ctx.shadowColor = "#FF00FF";
+                    ctx.shadowBlur = 15;
+
+                    ctx.fillText(hw.word, hw.x, hw.y);
+                }
             });
         }
 
@@ -158,27 +156,22 @@
 
         // Detect clicks or taps on the canvas
         canvas.addEventListener("click", (e) => {
-            const clickedX = Math.floor(e.clientX / fontSize);
+            const clickedX = e.clientX;
             const clickedY = e.clientY;
 
             hiddenWordPositions.forEach((hw) => {
                 if (
                     !hw.found &&
-                    hw.column === clickedX &&
-                    Math.abs(hw.y - clickedY) < fontSize * 3 // Forgiving hitbox
+                    Math.abs(hw.x - clickedX) < fontSize * 4 && // Forgiving hitbox
+                    Math.abs(hw.y - clickedY) < fontSize * 2
                 ) {
                     hw.found = true;
-                    hw.paused = true; // Stop the word from moving
                     foundWords++;
                     foundList.push(hw.word);
 
                     // Update the counter and word list
                     document.getElementById("foundCount").textContent = foundWords;
                     document.getElementById("foundWords").textContent = foundList.join(", ");
-
-                    // Highlight clicked word visually
-                    ctx.fillStyle = "#FFF";
-                    ctx.fillText(hw.word, hw.column * fontSize, hw.y);
 
                     // Show the reveal button when all words are found
                     if (foundWords === hiddenWords.length) {
