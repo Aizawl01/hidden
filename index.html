@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,12 +30,6 @@
             gap: 10px; /* Space between image and text */
         }
 
-        header img {
-            height: 50px; /* Adjust the size of the image */
-            width: auto;
-            filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
-        }
-
         header h1 {
             color: #FF00FF;
             font-family: 'Orbitron', sans-serif;
@@ -45,6 +38,84 @@
             text-transform: uppercase;
             text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF;
             margin: 0; /* Remove default margin */
+        }
+
+        /* Glitch Effect for Image */
+        .glitch {
+            position: relative;
+            height: 50px; /* Adjust the size of the image */
+            width: auto;
+        }
+
+        .glitch img {
+            height: 100%;
+            width: auto;
+            filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+
+        .glitch::before {
+            left: 2px;
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            20% {
+                clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%);
+            }
+            40% {
+                clip-path: polygon(0 40%, 100% 40%, 100% 50%, 0 50%);
+            }
+            60% {
+                clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+            }
+            80% {
+                clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%);
+            }
+            100% {
+                clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+            }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            20% {
+                clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%);
+            }
+            40% {
+                clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%);
+            }
+            60% {
+                clip-path: polygon(0 50%, 100% 50%, 100% 60%, 0 60%);
+            }
+            80% {
+                clip-path: polygon(0 70%, 100% 70%, 100% 80%, 0 80%);
+            }
+            100% {
+                clip-path: polygon(0 90%, 100% 90%, 100% 100%, 0 100%);
+            }
         }
 
         /* Counter Styling */
@@ -198,9 +269,11 @@
     </style>
 </head>
 <body>
-    <!-- Header with Image -->
+    <!-- Header with Glitch Image -->
     <header>
-        <img src="image_1 (1).png" alt="Khiangtevillain AI Logo"> <!-- Ensure the file is in the same directory -->
+        <div class="glitch">
+            <img src="image_1 (1).png" alt="Khiangtevillain AI Logo">
+        </div>
         <h1>Khiangtevillain AI: Hidden Word Challenge</h1>
     </header>
 
@@ -231,7 +304,7 @@
         <h2> Congratulations! </h2>
         <p>You found all the hidden words: <span id="alertFoundWords"></span>!</p>
         <p>
-            📜 Next Step:<br>
+             Next Step:<br>
             1️⃣ Return to the Aizawl Echo music video on YouTube (link).<br>
             2️⃣ Search for the scenes where these hidden words appear.<br>
             3️⃣ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.<br>
