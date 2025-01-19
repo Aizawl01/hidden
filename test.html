@@ -18,6 +18,41 @@
     </div>
 
     <!-- JavaScript -->
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('matrix');
+            const ctx = canvas?.getContext('2d'); // Use optional chaining to avoid errors
+            const zoomOverlay = document.getElementById('zoomOverlay');
+            const glitchImage = document.querySelector('.glitch'); // Small image in header
+
+            if (canvas) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            // Show Zoom Overlay
+            function showZoom() {
+                if (zoomOverlay) {
+                    zoomOverlay.style.display = "block";
+                    glitchImage.classList.add('no-glitch'); // Disable small image glitch
+                }
+            }
+
+            // Hide Zoom Overlay
+            function hideZoom() {
+                if (zoomOverlay) {
+                    zoomOverlay.style.display = "none";
+                    glitchImage.classList.remove('no-glitch'); // Re-enable small image glitch
+                }
+            }
+
+            // Hide Zoom Overlay on Click Outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.glitch') && !e.target.closest('.zoom-overlay')) {
+                    hideZoom();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
