@@ -45,19 +45,13 @@
             position: relative;
             height: 30px; /* Adjusted for mobile */
             width: auto;
-            overflow: hidden; /* Ensure zoom effect doesn't overflow */
+            cursor: pointer; /* Indicate the image is clickable */
         }
 
         .glitch img {
             height: 100%;
             width: auto;
             filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
-            transition: transform 0.5s ease; /* Smooth zoom transition */
-        }
-
-        /* Zoom Effect on Hover */
-        .glitch:hover img {
-            transform: scale(1.5); /* Zoom in 1.5x */
         }
 
         .glitch::before,
@@ -134,6 +128,27 @@
                 clip-path: polygon(0 90%, 100% 90%, 100% 100%, 0 100%);
                 transform: translate(0);
             }
+        }
+
+        /* Zoom Overlay */
+        .zoom-overlay {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #FF00FF;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 0 20px #FF00FF;
+        }
+
+        .zoom-overlay img {
+            height: 150px; /* Adjust size as needed */
+            width: auto;
+            filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
         }
 
         /* Counter Styling */
@@ -340,11 +355,16 @@
 <body>
     <!-- Header with Glitch Image -->
     <header>
-        <div class="glitch">
+        <div class="glitch" onclick="showZoom()" onmouseover="showZoom()" onmouseout="hideZoom()">
             <img src="image_1 (1).png" alt="Khiangtevillain AI Logo">
         </div>
         <h1>Khiangtevillain AI: Hidden Word Challenge</h1>
     </header>
+
+    <!-- Zoom Overlay -->
+    <div class="zoom-overlay" id="zoomOverlay">
+        <img src="image_1 (1).png" alt="Zoomed Khiangtevillain AI Logo">
+    </div>
 
     <!-- Counter -->
     <div class="counter">
@@ -391,6 +411,7 @@
         const revealButton = document.getElementById('reveal');
         const customAlert = document.getElementById('customAlert');
         const alertFoundWords = document.getElementById('alertFoundWords');
+        const zoomOverlay = document.getElementById('zoomOverlay');
         const audio = new Audio('aizawl.mp3');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -502,6 +523,23 @@
         function closeAlert() {
             customAlert.style.display = "none";
         }
+
+        // Show Zoom Overlay
+        function showZoom() {
+            zoomOverlay.style.display = "block";
+        }
+
+        // Hide Zoom Overlay
+        function hideZoom() {
+            zoomOverlay.style.display = "none";
+        }
+
+        // Hide Zoom Overlay on Click Outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.glitch') && !e.target.closest('.zoom-overlay')) {
+                hideZoom();
+            }
+        });
     </script>
 </body>
 </html>
