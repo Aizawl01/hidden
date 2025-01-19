@@ -3,21 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoom Overlay Glitch Test</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Khiangtevillain AI: Hidden Word Challenge</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ... (keep existing styles) ... */
+
+        /* Glitch Effect for Zoomed Image */
+        .zoom-overlay img {
+            height: 150px; /* Adjust size as needed */
+            width: auto;
+            filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
+            position: relative; /* Required for pseudo-elements */
+        }
+
+        .zoom-overlay img::before,
+        .zoom-overlay img::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('image_1 (1).png') no-repeat center center; /* Explicit image source */
+            background-size: contain;
+            opacity: 0.8;
+            mix-blend-mode: difference;
+        }
+
+        .zoom-overlay img::before {
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .zoom-overlay img::after {
+            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+    </style>
 </head>
 <body>
-    <!-- Small Image with Glitch Effect -->
-    <div class="glitch" onclick="showZoom()" onmouseover="showZoom()" onmouseout="hideZoom()">
-        <img src="image_1 (1).png" alt="Small Image">
-    </div>
+    <!-- Header with Glitch Image -->
+    <header>
+        <div class="glitch" onclick="showZoom()" onmouseover="showZoom()" onmouseout="hideZoom()">
+            <img src="image_1 (1).png" alt="Khiangtevillain AI Logo">
+        </div>
+        <h1>Khiangtevillain AI: Hidden Word Challenge</h1>
+    </header>
 
     <!-- Zoom Overlay -->
     <div class="zoom-overlay" id="zoomOverlay">
-        <img src="image_1 (1).png" alt="Zoomed Image">
+        <img src="image_1 (1).png" alt="Zoomed Khiangtevillain AI Logo">
     </div>
 
-    <!-- JavaScript -->
-    <script src="script.js"></script>
+    <!-- ... (keep existing HTML) ... -->
+
+    <script>
+        // ... (keep existing JavaScript) ...
+
+        // Show Zoom Overlay
+        function showZoom() {
+            zoomOverlay.style.display = "block";
+            glitchImage.classList.add('no-glitch'); // Disable small image glitch
+            // Enable glitch effect on zoomed image
+            const zoomedImage = zoomOverlay.querySelector('img');
+            zoomedImage.classList.remove('no-glitch');
+        }
+
+        // Hide Zoom Overlay
+        function hideZoom() {
+            zoomOverlay.style.display = "none";
+            glitchImage.classList.remove('no-glitch'); // Re-enable small image glitch
+            // Disable glitch effect on zoomed image
+            const zoomedImage = zoomOverlay.querySelector('img');
+            zoomedImage.classList.add('no-glitch');
+        }
+
+        // ... (keep existing JavaScript) ...
+    </script>
 </body>
 </html>
