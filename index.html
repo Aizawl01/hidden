@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khiangtevillain AI: Hidden Word Challenge</title>
+    <title>Khiangtevillain AI: Hidden Words Challenge</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
@@ -62,7 +62,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('image_1 (1).png') no-repeat center center;
+            background: url('image_1 (1).png') no-repeat center center; /* Updated image path */
             background-size: contain;
             opacity: 0.8;
             mix-blend-mode: difference;
@@ -74,12 +74,6 @@
 
         .glitch::after {
             animation: glitch-anim-2 2s infinite linear alternate-reverse;
-        }
-
-        /* Disable Glitch Effect */
-        .no-glitch::before,
-        .no-glitch::after {
-            display: none; /* Hide pseudo-elements */
         }
 
         @keyframes glitch-anim-1 {
@@ -151,32 +145,37 @@
             box-shadow: 0 0 20px #FF00FF;
         }
 
-        .zoom-overlay img {
+        .zoom-overlay .glitch-zoom {
+            position: relative;
             height: 150px; /* Adjust size as needed */
             width: auto;
-            filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
-            position: relative; /* Required for pseudo-elements */
         }
 
-        .zoom-overlay img::before,
-        .zoom-overlay img::after {
+        .zoom-overlay .glitch-zoom img {
+            height: 100%;
+            width: auto;
+            filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
+        }
+
+        .zoom-overlay .glitch-zoom::before,
+        .zoom-overlay .glitch-zoom::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('image_1 (1).png') no-repeat center center; /* Explicit image source */
+            background: url('image_1 (1).png') no-repeat center center; /* Updated image path */
             background-size: contain;
             opacity: 0.8;
             mix-blend-mode: difference;
         }
 
-        .zoom-overlay img::before {
+        .zoom-overlay .glitch-zoom::before {
             animation: glitch-anim-1 2s infinite linear alternate-reverse;
         }
 
-        .zoom-overlay img::after {
+        .zoom-overlay .glitch-zoom::after {
             animation: glitch-anim-2 2s infinite linear alternate-reverse;
         }
 
@@ -392,7 +391,9 @@
 
     <!-- Zoom Overlay -->
     <div class="zoom-overlay" id="zoomOverlay">
-        <img src="image_1 (1).png" alt="Zoomed Khiangtevillain AI Logo">
+        <div class="glitch-zoom">
+            <img src="image_1 (1).png" alt="Zoomed Khiangtevillain AI Logo">
+        </div>
     </div>
 
     <!-- Counter -->
@@ -422,8 +423,8 @@
         <h2> Congratulations! </h2>
         <p>You found all the hidden words: <span id="alertFoundWords"></span>!</p>
         <p>
-             Next Step:<br>
-             Return to the Aizawl Echo music video on YouTube (link).<br>
+            📑 Next Step:<br>
+            1️⃣ Return to the Aizawl Echo music video on YouTube (link).<br>
             2️⃣ Search for the scenes where these hidden words appear.<br>
             3️⃣ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.<br>
             4️⃣ Include your name, WhatsApp number, and GPay number.
@@ -442,7 +443,6 @@
         const alertFoundWords = document.getElementById('alertFoundWords');
         const zoomOverlay = document.getElementById('zoomOverlay');
         const audio = new Audio('aizawl.mp3');
-        const glitchImage = document.querySelector('.glitch'); // Small image in header
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -557,13 +557,11 @@
         // Show Zoom Overlay
         function showZoom() {
             zoomOverlay.style.display = "block";
-            glitchImage.classList.add('no-glitch'); // Disable small image glitch
         }
 
         // Hide Zoom Overlay
         function hideZoom() {
             zoomOverlay.style.display = "none";
-            glitchImage.classList.remove('no-glitch'); // Re-enable small image glitch
         }
 
         // Hide Zoom Overlay on Click Outside
