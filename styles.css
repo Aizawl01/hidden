@@ -1,0 +1,172 @@
+body {
+    margin: 0;
+    background: #000;
+    color: #fff;
+    font-family: 'Source Code Pro', monospace;
+    overflow: hidden;
+}
+
+/* Header Styling */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Space between image and text */
+}
+
+header h1 {
+    color: #FF00FF;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem; /* Adjusted for mobile */
+    font-weight: bold;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF;
+    margin: 0; /* Remove default margin */
+}
+
+/* Glitch Effect for Image */
+.glitch {
+    position: relative;
+    height: 30px; /* Adjusted for mobile */
+    width: auto;
+    cursor: pointer; /* Indicate the image is clickable */
+}
+
+.glitch img {
+    height: 100%;
+    width: auto;
+    filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
+}
+
+.glitch::before,
+.glitch::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('image_1 (1).png') no-repeat center center;
+    background-size: contain;
+    opacity: 0.8;
+    mix-blend-mode: difference;
+}
+
+.glitch::before {
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    animation: glitch-anim-2 2s infinite linear alternate-reverse;
+}
+
+/* Disable Glitch Effect */
+.no-glitch::before,
+.no-glitch::after {
+    display: none; /* Hide pseudo-elements */
+}
+
+@keyframes glitch-anim-1 {
+    0% {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        transform: translate(0);
+    }
+    20% {
+        clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%);
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        clip-path: polygon(0 40%, 100% 40%, 100% 50%, 0 50%);
+        transform: translate(2px, -2px);
+    }
+    60% {
+        clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+        transform: translate(-2px, 0);
+    }
+    80% {
+        clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%);
+        transform: translate(2px, 0);
+    }
+    100% {
+        clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+        transform: translate(0);
+    }
+}
+
+@keyframes glitch-anim-2 {
+    0% {
+        clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        transform: translate(0);
+    }
+    20% {
+        clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%);
+        transform: translate(2px, -2px);
+    }
+    40% {
+        clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%);
+        transform: translate(-2px, 2px);
+    }
+    60% {
+        clip-path: polygon(0 50%, 100% 50%, 100% 60%, 0 60%);
+        transform: translate(2px, 0);
+    }
+    80% {
+        clip-path: polygon(0 70%, 100% 70%, 100% 80%, 0 80%);
+        transform: translate(-2px, 0);
+    }
+    100% {
+        clip-path: polygon(0 90%, 100% 90%, 100% 100%, 0 100%);
+        transform: translate(0);
+    }
+}
+
+/* Zoom Overlay */
+.zoom-overlay {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #FF00FF;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 0 20px #FF00FF;
+}
+
+.zoom-overlay img {
+    height: 150px; /* Adjust size as needed */
+    width: auto;
+    filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
+    position: relative; /* Required for pseudo-elements */
+}
+
+.zoom-overlay img::before,
+.zoom-overlay img::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('image_1 (1).png') no-repeat center center; /* Explicit image source */
+    background-size: contain;
+    opacity: 0.8;
+    mix-blend-mode: difference;
+}
+
+.zoom-overlay img::before {
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+}
+
+.zoom-overlay img::after {
+    animation: glitch-anim-2 2s infinite linear alternate-reverse;
+}
