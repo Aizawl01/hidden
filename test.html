@@ -3,65 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khiangtevillain AI: Hidden Word Challenge</title>
-    <!-- Link to CSS -->
+    <title>Zoom Overlay Glitch Test</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Header with Glitch Image -->
-    <header>
-        <div class="glitch" onclick="showZoom()" onmouseover="showZoom()" onmouseout="hideZoom()">
-            <img src="image_1 (1).png" alt="Khiangtevillain AI Logo">
-        </div>
-        <h1>Khiangtevillain AI: Hidden Word Challenge</h1>
-    </header>
+    <!-- Small Image with Glitch Effect -->
+    <div class="glitch" onclick="showZoom()" onmouseover="showZoom()" onmouseout="hideZoom()">
+        <img src="image_1 (1).png" alt="Small Image">
+    </div>
 
     <!-- Zoom Overlay -->
     <div class="zoom-overlay" id="zoomOverlay">
-        <img src="image_1 (1).png" alt="Zoomed Khiangtevillain AI Logo">
+        <img src="image_1 (1).png" alt="Zoomed Image">
     </div>
 
-    <!-- Counter -->
-    <div class="counter">
-        Found: <span id="foundCount">0</span>/5<br>
-        Words: <span id="foundWords">None yet</span>
-    </div>
-
-    <!-- Instructions -->
-    <div class="instructions">
-        Tap or click the glowing hidden words as they fall! Once all words are found, click "Reveal" to see how to submit your entry.
-    </div>
-    
-    <!-- Reveal Button -->
-    <button id="reveal">Reveal Instructions</button>
-    
-    <!-- Matrix Animation Canvas -->
-    <canvas id="matrix"></canvas>
-
-    <!-- Marquee Transition -->
-    <div class="marquee" id="marquee">
-        <h1>Aizawl, you're my heartbeat's song</h1>
-    </div>
-
-    <!-- Custom Alert Window -->
-    <div class="custom-alert" id="customAlert">
-        <h2> Congratulations! </h2>
-        <p>You found all the hidden words: <span id="alertFoundWords"></span>!</p>
-        <p>
-             Next Step:<br>
-             Return to the Aizawl Echo music video on YouTube (link).<br>
-            2️⃣ Search for the scenes where these hidden words appear.<br>
-            3️⃣ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.<br>
-            4️⃣ Include your name, WhatsApp number, and GPay number.
-        </p>
-        <p>🎁 Winners: If multiple entries are received, we’ll conduct a lucky draw!</p>
-        <p>🍀 Good luck, and thank you for playing! 🚀</p>
-        <button onclick="closeAlert()">OK</button>
-    </div>
-
-    <!-- Link to JavaScript -->
+    <!-- JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
