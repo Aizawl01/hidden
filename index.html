@@ -45,12 +45,19 @@
             position: relative;
             height: 30px; /* Adjusted for mobile */
             width: auto;
+            overflow: hidden; /* Ensure zoom effect doesn't overflow */
         }
 
         .glitch img {
             height: 100%;
             width: auto;
             filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
+            transition: transform 0.5s ease; /* Smooth zoom transition */
+        }
+
+        /* Zoom Effect on Hover */
+        .glitch:hover img {
+            transform: scale(1.5); /* Zoom in 1.5x */
         }
 
         .glitch::before,
