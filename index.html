@@ -76,6 +76,12 @@
             animation: glitch-anim-2 2s infinite linear alternate-reverse;
         }
 
+        /* Disable Glitch Effect */
+        .no-glitch::before,
+        .no-glitch::after {
+            display: none; /* Hide pseudo-elements */
+        }
+
         @keyframes glitch-anim-1 {
             0% {
                 clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
@@ -436,6 +442,7 @@
         const alertFoundWords = document.getElementById('alertFoundWords');
         const zoomOverlay = document.getElementById('zoomOverlay');
         const audio = new Audio('aizawl.mp3');
+        const glitchImage = document.querySelector('.glitch'); // Small image in header
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -550,11 +557,13 @@
         // Show Zoom Overlay
         function showZoom() {
             zoomOverlay.style.display = "block";
+            glitchImage.classList.add('no-glitch'); // Disable small image glitch
         }
 
         // Hide Zoom Overlay
         function hideZoom() {
             zoomOverlay.style.display = "none";
+            glitchImage.classList.remove('no-glitch'); // Re-enable small image glitch
         }
 
         // Hide Zoom Overlay on Click Outside
