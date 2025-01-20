@@ -466,6 +466,11 @@
             transform: translate(-50%, -50%);
             text-align: center;
             z-index: 6;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #FF00FF;
+            box-shadow: 0 0 20px #FF00FF;
         }
 
         #thankYouMessage h2 {
@@ -492,6 +497,11 @@
             color: #00FFFF;
             font-family: 'Orbitron', sans-serif;
             text-shadow: 0 0 10px #00FFFF, 0 0 20px #FF00FF;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #FF00FF;
+            box-shadow: 0 0 20px #FF00FF;
         }
 
         #leaderboard h2 {
@@ -546,7 +556,7 @@
     </div>
     
     <!-- Reveal Button -->
-    <button id="reveal">Reveal Instructions 🚀</button>
+    <button id="reveal">Reveal Instructions </button>
     
     <!-- Matrix Background -->
     <canvas id="matrix"></canvas>
@@ -600,6 +610,8 @@
         const customAlert = document.getElementById('customAlert');
         const alertFoundWords = document.getElementById('alertFoundWords');
         const zoomOverlay = document.getElementById('zoomOverlay');
+        const thankYouMessage = document.getElementById('thankYouMessage');
+        const leaderboard = document.getElementById('leaderboard');
         const audio = new Audio('aizawl.mp3');
         audio.loop = true; // Ensure the audio loops indefinitely
 
@@ -736,10 +748,9 @@
         document.querySelector('.custom-alert button').addEventListener('click', () => {
             customAlert.style.display = "none";
 
-            const message = document.getElementById('thankYouMessage');
-            message.style.display = 'block';
+            thankYouMessage.style.display = 'block';
             anime({
-                targets: message,
+                targets: thankYouMessage,
                 opacity: [0, 1],
                 translateY: [20, 0],
                 duration: 1000,
@@ -749,7 +760,7 @@
             const endTime = Date.now();
             const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
             document.getElementById('timeTaken').textContent = timeTaken;
-            document.getElementById('leaderboard').style.display = 'block';
+            leaderboard.style.display = 'block';
 
             const scores = JSON.parse(localStorage.getItem('scores') || '[]');
             scores.push({ time: timeTaken, date: new Date().toLocaleString() });
@@ -779,7 +790,6 @@
 
         function displayAllScores() {
             const scores = JSON.parse(localStorage.getItem('scores') || '[]');
-            const leaderboard = document.getElementById('leaderboard');
             scores.forEach((score, index) => {
                 const scoreElement = document.createElement('p');
                 scoreElement.textContent = `#${index + 1}: ${score.time} seconds (${score.date}) ⏱️`;
