@@ -461,9 +461,9 @@
         #thankYouMessage {
             display: none;
             position: fixed;
-            top: 50%;
+            bottom: 80px; /* Adjusted for mobile */
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translateX(-50%);
             text-align: center;
             z-index: 7; /* Higher z-index to ensure it appears above other elements */
             background: rgba(0, 0, 0, 0.9);
@@ -471,6 +471,8 @@
             border-radius: 10px;
             border: 2px solid #FF00FF;
             box-shadow: 0 0 20px #FF00FF;
+            width: 90%; /* Adjusted for mobile */
+            max-width: 400px; /* Adjusted for mobile */
         }
 
         #thankYouMessage h2 {
@@ -490,8 +492,8 @@
         #leaderboard {
             display: none;
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 20px; /* Adjusted for mobile */
+            right: 20px; /* Adjusted for mobile */
             text-align: right;
             z-index: 7; /* Higher z-index to ensure it appears above other elements */
             color: #00FFFF;
@@ -502,6 +504,8 @@
             border-radius: 10px;
             border: 2px solid #FF00FF;
             box-shadow: 0 0 20px #FF00FF;
+            width: 90%; /* Adjusted for mobile */
+            max-width: 200px; /* Adjusted for mobile */
         }
 
         #leaderboard h2 {
@@ -525,6 +529,32 @@
 
         body.completed {
             animation: dynamicBackground 5s infinite;
+        }
+
+        /* Mobile Responsive Adjustments */
+        @media (max-width: 768px) {
+            .counter {
+                top: 80px; /* Adjusted for mobile */
+                font-size: 0.9rem; /* Adjusted for mobile */
+            }
+
+            .instructions {
+                top: 140px; /* Adjusted for mobile */
+                font-size: 0.8rem; /* Adjusted for mobile */
+            }
+
+            #thankYouMessage {
+                bottom: 100px; /* Adjusted for mobile */
+                width: 90%; /* Adjusted for mobile */
+                max-width: 300px; /* Adjusted for mobile */
+            }
+
+            #leaderboard {
+                top: 10px; /* Adjusted for mobile */
+                right: 10px; /* Adjusted for mobile */
+                width: 90%; /* Adjusted for mobile */
+                max-width: 150px; /* Adjusted for mobile */
+            }
         }
     </style>
 </head>
