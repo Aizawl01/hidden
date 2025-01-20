@@ -511,7 +511,7 @@
                 Aizawl (ACity) Serenade music video on YouTube
             </a>.<br>
              Search for the scenes where these hidden words appear.<br>
-            3️⃣ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.<br>
+             Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.<br>
             4️⃣ Include your name, WhatsApp number, and GPay number.
         </p>
         <p>🎁 Winners: If multiple entries are received, we’ll conduct a lucky draw!</p>
@@ -528,6 +528,8 @@
         const alertFoundWords = document.getElementById('alertFoundWords');
         const zoomOverlay = document.getElementById('zoomOverlay');
         const audio = new Audio('aizawl.mp3');
+        audio.loop = true; // Ensure the audio loops indefinitely
+
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -550,41 +552,11 @@
 
         // Beat timings from beats.txt
         const beatTimings = [
-            0.359909	0.359909	3
-0.917188	0.917188	4
-1.497687	1.497687	1
-2.089796	2.089796	2
-2.681905	2.681905	3
-3.274014	3.274014	4
-3.866122	3.866122	1
-4.469841	4.469841	2
-5.061950	5.061950	3
-5.654059	5.654059	4
-6.246168	6.246168	1
-6.838277	6.838277	2
-7.441995	7.441995	3
-8.034104	8.034104	4
-8.626213	8.626213	1
-9.218322	9.218322	2
-9.798821	9.798821	3
-10.402540	10.402540	4
-10.994649	10.994649	1
-11.598367	11.598367	2
-12.190476	12.190476	3
-12.782585	12.782585	4
-13.374694	13.374694	1
-13.966803	13.966803	2
-14.558912	14.558912	3
-15.162630	15.162630	4
-15.754739	15.754739	1
-16.346848	16.346848	2
-16.938957	16.938957	3
-17.542676	17.542676	4
-18.134785	18.134785	1
-18.726893	18.726893	2
-19.319002	19.319002	3
-19.911111	19.911111	4
-
+            0.359909, 0.917188, 1.497687, 2.089796, 2.681905, 3.274014, 3.866122, 4.469841,
+            5.061950, 5.654059, 6.246168, 6.838277, 7.441995, 8.034104, 8.626213, 9.218322,
+            9.798821, 10.402540, 10.994649, 11.598367, 12.190476, 12.782585, 13.374694,
+            13.966803, 14.558912, 15.162630, 15.754739, 16.346848, 16.938957, 17.542676,
+            18.134785, 18.726893, 19.319002, 19.911111
         ];
         let currentBeatIndex = 0;
 
@@ -708,13 +680,6 @@
             if (!e.target.closest('.glitch') && !e.target.closest('.zoom-overlay')) {
                 hideZoom();
             }
-        });
-
-        // Start the marquee animation when audio plays
-        audio.play().then(() => {
-            animateMarquee();
-        }).catch((error) => {
-            console.error('Audio playback failed:', error);
         });
     </script>
 </body>
