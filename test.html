@@ -3,40 +3,458 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khiangtevillain AI: Hidden Word Challenge</title>
-    <!-- Google Fonts -->
+    <title>Khiangtevillain AI: Hidden Words Challenge</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* ... (keep existing styles) ... */
-
-        /* Glitch Effect for Zoomed Image */
-        .zoom-overlay img {
-            height: 150px; /* Adjust size as needed */
-            width: auto;
-            filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
-            position: relative; /* Required for pseudo-elements */
+        body {
+            margin: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Source Code Pro', monospace;
+            overflow: hidden;
         }
 
-        .zoom-overlay img::before,
-        .zoom-overlay img::after {
+        /* Header Styling */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 10px 0;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Space between image and text */
+        }
+
+        /* Updated Cyberpunk Glowing Heading Design */
+        header h1 {
+            position: relative;
+            color: #FF00FF;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF;
+            -webkit-text-stroke: 1px #00FFFF;
+            -webkit-text-fill-color: transparent;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        /* Glitch Effect Layers */
+        header h1::before,
+        header h1::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+        }
+
+        header h1::before {
+            color: #00FFFF;
+            z-index: -1;
+            animation: glitch-before 2s infinite;
+        }
+
+        header h1::after {
+            color: #FF00FF;
+            z-index: -2;
+            animation: glitch-after 1.5s infinite;
+        }
+
+        @keyframes glow {
+            0% {
+                -webkit-text-stroke: 1px #00FFFF;
+                text-shadow: 0 0 10px #FF00FF, 0 0 20px #FF00FF, 0 0 30px #FF00FF;
+            }
+            100% {
+                -webkit-text-stroke: 2px #00FFFF;
+                text-shadow: 0 0 20px #00FFFF, 0 0 40px #00FFFF, 0 0 60px #00FFFF;
+            }
+        }
+
+        @keyframes glitch-before {
+            0% {
+                transform: translate(0);
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            25% {
+                transform: translate(-5px, 5px);
+                clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%);
+            }
+            50% {
+                transform: translate(5px, -5px);
+                clip-path: polygon(0 40%, 100% 40%, 100% 50%, 0 50%);
+            }
+            75% {
+                transform: translate(-5px, 0);
+                clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+            }
+            100% {
+                transform: translate(0);
+                clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%);
+            }
+        }
+
+        @keyframes glitch-after {
+            0% {
+                transform: translate(0);
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            }
+            25% {
+                transform: translate(5px, -5px);
+                clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%);
+            }
+            50% {
+                transform: translate(-5px, 5px);
+                clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%);
+            }
+            75% {
+                transform: translate(5px, 0);
+                clip-path: polygon(0 50%, 100% 50%, 100% 60%, 0 60%);
+            }
+            100% {
+                transform: translate(0);
+                clip-path: polygon(0 70%, 100% 70%, 100% 80%, 0 80%);
+            }
+        }
+
+        /* Counter Styling */
+        .counter {
+            position: fixed;
+            top: 120px; /* Adjusted for mobile to avoid overlap */
+            width: 100%;
+            text-align: center;
+            color: #00FFFF;
+            font-size: 1rem; /* Adjusted for mobile */
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #00FFFF;
+            z-index: 2;
+        }
+
+        /* Instructions Styling */
+        .instructions {
+            position: fixed;
+            top: 180px; /* Adjusted for mobile to avoid overlap with revealed words */
+            width: 100%;
+            text-align: center;
+            color: #FFF;
+            font-size: 0.9rem; /* Adjusted for mobile */
+            text-shadow: 0 0 5px #FF00FF;
+            z-index: 2;
+            max-width: 90%;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+
+        /* [Rest of your CSS styles remain unchanged] */
+        .glitch {
+            position: relative;
+            height: 50px; /* Adjusted for mobile */
+            width: auto;
+            cursor: pointer; /* Indicate the image is clickable */
+        }
+
+        .glitch img {
+            height: 100%;
+            width: auto;
+            filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
+        }
+
+        .glitch::before,
+        .glitch::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('image_1 (1).png') no-repeat center center; /* Explicit image source */
+            background: url('image_1 (1).png') no-repeat center center; /* Updated image path */
             background-size: contain;
             opacity: 0.8;
             mix-blend-mode: difference;
         }
 
-        .zoom-overlay img::before {
+        .glitch::before {
             animation: glitch-anim-1 2s infinite linear alternate-reverse;
         }
 
-        .zoom-overlay img::after {
+        .glitch::after {
             animation: glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim-1 {
+            0% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+                transform: translate(0);
+            }
+            20% {
+                clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%);
+                transform: translate(-2px, 2px);
+            }
+            40% {
+                clip-path: polygon(0 40%, 100% 40%, 100% 50%, 0 50%);
+                transform: translate(2px, -2px);
+            }
+            60% {
+                clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+                transform: translate(-2px, 0);
+            }
+            80% {
+                clip-path: polygon(0 80%, 100% 80%, 100% 90%, 0 90%);
+                transform: translate(2px, 0);
+            }
+            100% {
+                clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+                transform: translate(0);
+            }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% {
+                clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+                transform: translate(0);
+            }
+            20% {
+                clip-path: polygon(0 10%, 100% 10%, 100% 20%, 0 20%);
+                transform: translate(2px, -2px);
+            }
+            40% {
+                clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%);
+                transform: translate(-2px, 2px);
+            }
+            60% {
+                clip-path: polygon(0 50%, 100% 50%, 100% 60%, 0 60%);
+                transform: translate(2px, 0);
+            }
+            80% {
+                clip-path: polygon(0 70%, 100% 70%, 100% 80%, 0 80%);
+                transform: translate(-2px, 0);
+            }
+            100% {
+                clip-path: polygon(0 90%, 100% 90%, 100% 100%, 0 100%);
+                transform: translate(0);
+            }
+        }
+
+        /* Zoom Overlay */
+        .zoom-overlay {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #FF00FF;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 0 20px #FF00FF;
+        }
+
+        .zoom-overlay .glitch-zoom {
+            position: relative;
+            height: 200px; /* Adjust size as needed */
+            width: auto;
+        }
+
+        .zoom-overlay .glitch-zoom img {
+            height: 100%;
+            width: auto;
+            filter: drop-shadow(0 0 10px #FF00FF) drop-shadow(0 0 20px #FF00FF);
+        }
+
+        .zoom-overlay .glitch-zoom::before,
+        .zoom-overlay .glitch-zoom::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('image_1 (1).png') no-repeat center center; /* Updated image path */
+            background-size: contain;
+            opacity: 0.8;
+            mix-blend-mode: difference;
+        }
+
+        .zoom-overlay .glitch-zoom::before {
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        }
+
+        .zoom-overlay .glitch-zoom::after {
+            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+        }
+
+        /* Reveal Button Styling */
+        #reveal {
+            display: none;
+            position: fixed;
+            bottom: 20px; /* Adjusted for mobile */
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px; /* Adjusted for mobile */
+            background: linear-gradient(90deg, #FF00FF, #00FFFF);
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem; /* Adjusted for mobile */
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 2;
+            text-shadow: none;
+            box-shadow: 0 0 15px #FF00FF;
+            transition: all 0.3s ease;
+        }
+
+        #reveal:hover {
+            background: linear-gradient(90deg, #00FFFF, #FF00FF);
+            color: #FFF;
+            box-shadow: 0 0 25px #00FFFF;
+        }
+
+        /* Matrix Animation Canvas */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* Marquee Transition */
+        .marquee {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #FF00FF, #00FFFF);
+            color: #FFF;
+            justify-content: center;
+            align-items: center;
+            z-index: 3;
+        }
+
+        .marquee h1 {
+            animation: flicker 1.5s infinite, glow-beat 0.5s infinite alternate;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 6vw; /* Adjusted for mobile */
+            text-align: center;
+            padding: 0 20px;
+            text-shadow: 0 0 20px #FFF, 0 0 40px #00FFFF, 0 0 60px #FF00FF;
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% {
+                opacity: 1;
+            }
+            20%, 24%, 55% {
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes glow-beat {
+            0% {
+                text-shadow: 0 0 10px #FFF, 0 0 20px #00FFFF, 0 0 30px #FF00FF;
+            }
+            100% {
+                text-shadow: 0 0 20px #FFF, 0 0 40px #00FFFF, 0 0 60px #FF00FF;
+            }
+        }
+
+        /* Custom Alert Window */
+        .custom-alert {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #1A1A1A;
+            border: 2px solid #FF00FF;
+            border-radius: 10px;
+            padding: 10px; /* Adjusted for mobile */
+            width: 90%; /* Adjusted for mobile */
+            max-width: 400px; /* Adjusted for mobile */
+            box-shadow: 0 0 20px #FF00FF, 0 0 40px #00FFFF;
+            z-index: 4;
+            color: #00FFFF;
+            font-family: 'Source Code Pro', monospace;
+            text-align: center;
+            overflow-y: auto; /* Enable scrolling if content is too long */
+            max-height: 90vh; /* Ensure it doesn't exceed screen height */
+        }
+
+        .custom-alert h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem; /* Adjusted for mobile */
+            color: #FF00FF;
+            margin-bottom: 10px; /* Adjusted for mobile */
+        }
+
+        .custom-alert p {
+            font-size: 0.8rem; /* Adjusted for mobile */
+            line-height: 1.5;
+            margin-bottom: 10px; /* Adjusted for mobile */
+        }
+
+        .custom-alert button {
+            padding: 6px 12px; /* Adjusted for mobile */
+            background: linear-gradient(90deg, #FF00FF, #00FFFF);
+            color: #000;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem; /* Adjusted for mobile */
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #FF00FF;
+            transition: all 0.3s ease;
+        }
+
+        .custom-alert button:hover {
+            background: linear-gradient(90deg, #00FFFF, #FF00FF);
+            color: #FFF;
+            box-shadow: 0 0 20px #00FFFF;
+        }
+
+        /* NEON CYBERPUNK YOUTUBE LINK STYLES */
+        .youtube-link {
+            color: #00ffff; /* Neon cyan */
+            text-decoration: none;
+            font-weight: bold;
+            text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border-bottom: 2px solid #ff00ff;
+            padding-bottom: 2px;
+        }
+
+        .youtube-link:hover {
+            color: #ff00ff; /* Neon magenta */
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border-bottom-color: #00ffff;
+        }
+
+        .youtube-link::after {
+            content: '';
+            margin-left: 5px;
+            font-size: 0.8em;
+            animation: link-glitch 0.8s infinite;
+        }
+
+        @keyframes link-glitch {
+            0% { opacity: 1; text-shadow: 0 0 5px #00ffff; }
+            50% { opacity: 0.5; text-shadow: 0 0 10px #ff00ff; }
+            100% { opacity: 1; text-shadow: 0 0 5px #00ffff; }
         }
     </style>
 </head>
@@ -46,38 +464,258 @@
         <div class="glitch" onclick="showZoom()" onmouseover="showZoom()" onmouseout="hideZoom()">
             <img src="image_1 (1).png" alt="Khiangtevillain AI Logo">
         </div>
-        <h1>Khiangtevillain AI: Hidden Word Challenge</h1>
+        <h1 data-text="Khiangtevillain AI: Hidden Words Challenge">Khiangtevillain AI: Hidden Words Challenge</h1>
     </header>
 
     <!-- Zoom Overlay -->
     <div class="zoom-overlay" id="zoomOverlay">
-        <img src="image_1 (1).png" alt="Zoomed Khiangtevillain AI Logo">
+        <div class="glitch-zoom">
+            <img src="image_1 (1).png" alt="Zoomed Logo">
+        </div>
     </div>
 
-    <!-- ... (keep existing HTML) ... -->
+    <!-- Counter -->
+    <div class="counter">
+        Found: <span id="foundCount">0</span>/5<br>
+        Words: <span id="foundWords">None yet</span>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions">
+        <b>Tap or click the glowing hidden words as they fall! Once all words are found, click "Reveal" to see how to submit your entry.</b>
+    </div>
+    
+    <!-- Reveal Button -->
+    <button id="reveal">Reveal Instructions</button>
+    
+    <!-- Matrix Background -->
+    <canvas id="matrix"></canvas>
+
+    <!-- Marquee Transition -->
+    <div class="marquee" id="marquee">
+        <h1>Aizawl, you're my heartbeat's song</h1>
+    </div>
+
+    <!-- Custom Alert Window -->
+    <div class="custom-alert" id="customAlert">
+        <h2> Congratulations! </h2>
+        <p>You found all the hidden words: <span id="alertFoundWords"></span>!</p>
+        <p>
+             Next Step:<br>
+             Return to the 
+            <a href="https://youtu.be/LQm_XCw_I08?si=x69oU5h-J8Y2rBvE" 
+               target="_blank" 
+               class="youtube-link"
+               onmouseover="this.style.textShadow='0 0 15px #00ffff, 0 0 30px #ff00ff'"
+               onmouseout="this.style.textShadow='0 0 5px #00ffff, 0 0 10px #ff00ff'">
+                Aizawl (ACity) Serenade music video on YouTube
+            </a>.<br>
+             Search for the scenes where these hidden words appear.<br>
+            3️⃣ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.<br>
+            4️⃣ Include your name, WhatsApp number, and GPay number.
+        </p>
+        <p>🎁 Winners: If multiple entries are received, we’ll conduct a lucky draw!</p>
+        <p>🍀 Good luck, and thank you for playing! 🚀</p>
+        <button onclick="closeAlert()">OK</button>
+    </div>
 
     <script>
-        // ... (keep existing JavaScript) ...
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        const marquee = document.getElementById('marquee');
+        const revealButton = document.getElementById('reveal');
+        const customAlert = document.getElementById('customAlert');
+        const alertFoundWords = document.getElementById('alertFoundWords');
+        const zoomOverlay = document.getElementById('zoomOverlay');
+        const audio = new Audio('aizawl.mp3');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const fontSize = 18;
+        const columns = Math.floor(canvas.width / fontSize);
+        const drops = Array(columns).fill(1);
+
+        // Matrix-style characters (including symbols)
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()_+-=[]{}|;':\",./<>?";
+        const hiddenWords = ["aijal", "downtown", "Acity", "khiangtevillain ai", "aizawl echo"]; // Original hidden words
+        let foundWords = 0;
+        const foundList = [];
+
+        const hiddenWordPositions = hiddenWords.map((word) => ({
+            word,
+            column: Math.floor(Math.random() * columns),
+            y: Math.random() * canvas.height,
+            found: false,
+        }));
+
+        // Beat timings from beats.txt
+        const beatTimings = [
+            0.359909	0.359909	3
+0.917188	0.917188	4
+1.497687	1.497687	1
+2.089796	2.089796	2
+2.681905	2.681905	3
+3.274014	3.274014	4
+3.866122	3.866122	1
+4.469841	4.469841	2
+5.061950	5.061950	3
+5.654059	5.654059	4
+6.246168	6.246168	1
+6.838277	6.838277	2
+7.441995	7.441995	3
+8.034104	8.034104	4
+8.626213	8.626213	1
+9.218322	9.218322	2
+9.798821	9.798821	3
+10.402540	10.402540	4
+10.994649	10.994649	1
+11.598367	11.598367	2
+12.190476	12.190476	3
+12.782585	12.782585	4
+13.374694	13.374694	1
+13.966803	13.966803	2
+14.558912	14.558912	3
+15.162630	15.162630	4
+15.754739	15.754739	1
+16.346848	16.346848	2
+16.938957	16.938957	3
+17.542676	17.542676	4
+18.134785	18.134785	1
+18.726893	18.726893	2
+19.319002	19.319002	3
+19.911111	19.911111	4
+
+        ];
+        let currentBeatIndex = 0;
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = `${fontSize}px 'Source Code Pro', monospace`;
+
+            // Draw falling characters
+            drops.forEach((y, x) => {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                const neonColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
+
+                ctx.fillStyle = neonColor;
+                ctx.shadowColor = neonColor;
+                ctx.shadowBlur = 15;
+
+                ctx.fillText(text, x * fontSize, y * fontSize);
+
+                if (y * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[x] = 0;
+                }
+
+                drops[x]++;
+            });
+
+            // Draw hidden words only if marquee is not displayed
+            if (marquee.style.display !== "flex") {
+                hiddenWordPositions.forEach((hw) => {
+                    if (!hw.found) {
+                        ctx.fillStyle = "#FF00FF";
+                        ctx.shadowColor = "#FF00FF";
+                        ctx.shadowBlur = 15;
+
+                        ctx.fillText(hw.word, hw.column * fontSize, hw.y);
+                        hw.y += fontSize / 2;
+
+                        if (hw.y > canvas.height) {
+                            hw.y = 0;
+                            hw.column = Math.floor(Math.random() * columns);
+                        }
+                    }
+                });
+            }
+        }
+
+        function animateMarquee() {
+            const currentTime = audio.currentTime;
+
+            // Check if the current time matches a beat timing
+            if (currentBeatIndex < beatTimings.length && currentTime >= beatTimings[currentBeatIndex]) {
+                // Intensify marquee text glow and background color
+                const hue = (currentBeatIndex / beatTimings.length) * 360;
+                marquee.style.background = `linear-gradient(90deg, hsl(${hue}, 100%, 50%), hsl(${(hue + 180) % 360}, 100%, 50%))`;
+                currentBeatIndex++;
+            }
+
+            requestAnimationFrame(animateMarquee);
+        }
+
+        setInterval(drawMatrix, 50);
+
+        // Detect clicks or taps on the canvas
+        canvas.addEventListener("click", (e) => {
+            const clickedX = e.clientX;
+            const clickedY = e.clientY;
+
+            hiddenWordPositions.forEach((hw) => {
+                if (
+                    !hw.found &&
+                    Math.abs(hw.column * fontSize - clickedX) < fontSize * 4 &&
+                    Math.abs(hw.y - clickedY) < fontSize * 2
+                ) {
+                    hw.found = true;
+                    foundWords++;
+                    foundList.push(hw.word);
+
+                    document.getElementById("foundCount").textContent = foundWords;
+                    document.getElementById("foundWords").textContent = foundList.join(", ");
+
+                    if (foundWords === hiddenWords.length) {
+                        revealButton.style.display = "block";
+                    }
+                }
+            });
+        });
+
+        // Reveal Button Functionality
+        revealButton.addEventListener('click', () => {
+            // Show marquee and play audio
+            marquee.style.display = "flex";
+            audio.play().catch((error) => {
+                console.error('Audio playback failed:', error);
+            });
+
+            // Hide marquee after 5 seconds and show custom alert
+            setTimeout(() => {
+                marquee.style.display = "none";
+                alertFoundWords.textContent = foundList.join(", ");
+                customAlert.style.display = "block";
+            }, 5000); // 5 seconds delay
+        });
+
+        // Close Custom Alert
+        function closeAlert() {
+            customAlert.style.display = "none";
+        }
 
         // Show Zoom Overlay
         function showZoom() {
             zoomOverlay.style.display = "block";
-            glitchImage.classList.add('no-glitch'); // Disable small image glitch
-            // Enable glitch effect on zoomed image
-            const zoomedImage = zoomOverlay.querySelector('img');
-            zoomedImage.classList.remove('no-glitch');
         }
 
         // Hide Zoom Overlay
         function hideZoom() {
             zoomOverlay.style.display = "none";
-            glitchImage.classList.remove('no-glitch'); // Re-enable small image glitch
-            // Disable glitch effect on zoomed image
-            const zoomedImage = zoomOverlay.querySelector('img');
-            zoomedImage.classList.add('no-glitch');
         }
 
-        // ... (keep existing JavaScript) ...
+        // Hide Zoom Overlay on Click Outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.glitch') && !e.target.closest('.zoom-overlay')) {
+                hideZoom();
+            }
+        });
+
+        // Start the marquee animation when audio plays
+        audio.play().then(() => {
+            animateMarquee();
+        }).catch((error) => {
+            console.error('Audio playback failed:', error);
+        });
     </script>
 </body>
 </html>
