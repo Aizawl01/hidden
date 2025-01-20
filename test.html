@@ -456,6 +456,27 @@
             50% { opacity: 0.5; text-shadow: 0 0 10px #ff00ff; }
             100% { opacity: 1; text-shadow: 0 0 5px #00ffff; }
         }
+
+        /* Thank You Message */
+        #thankYouMessage {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* YouTube Player */
+        #youtubePlayer {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Leaderboard */
+        #leaderboard {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -519,6 +540,31 @@
         <button onclick="closeAlert()">OK</button>
     </div>
 
+    <!-- Thank You Message -->
+    <div id="thankYouMessage">
+        <h2>Thank You for Playing!</h2>
+        <p>We hope you enjoyed the challenge. Stay tuned for more!</p>
+    </div>
+
+    <!-- YouTube Player -->
+    <div id="youtubePlayer">
+        <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/LQm_XCw_I08?autoplay=1&mute=1"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+        </iframe>
+    </div>
+
+    <!-- Leaderboard -->
+    <div id="leaderboard">
+        <h2>Your Score</h2>
+        <p>Time Taken: <span id="timeTaken">0</span> seconds</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script>
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
@@ -560,15 +606,21 @@
         ];
         let currentBeatIndex = 0;
 
+        let mouseX = 0, mouseY = 0;
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
         function drawMatrix() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.font = `${fontSize}px 'Source Code Pro', monospace`;
 
-            // Draw falling characters
             drops.forEach((y, x) => {
                 const text = chars[Math.floor(Math.random() * chars.length)];
-                const neonColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
+                const distance = Math.sqrt((x * fontSize - mouseX) ** 2 + (y * fontSize - mouseY) ** 2);
+                const neonColor = `hsl(${distance % 360}, 100%, 75%)`;
 
                 ctx.fillStyle = neonColor;
                 ctx.shadowColor = neonColor;
@@ -583,7 +635,6 @@
                 drops[x]++;
             });
 
-            // Draw hidden words only if marquee is not displayed
             if (marquee.style.display !== "flex") {
                 hiddenWordPositions.forEach((hw) => {
                     if (!hw.found) {
@@ -606,9 +657,7 @@
         function animateMarquee() {
             const currentTime = audio.currentTime;
 
-            // Check if the current time matches a beat timing
             if (currentBeatIndex < beatTimings.length && currentTime >= beatTimings[currentBeatIndex]) {
-                // Intensify marquee text glow and background color
                 const hue = (currentBeatIndex / beatTimings.length) * 360;
                 marquee.style.background = `linear-gradient(90deg, hsl(${hue}, 100%, 50%), hsl(${(hue + 180) % 360}, 100%, 50%))`;
                 currentBeatIndex++;
@@ -619,7 +668,6 @@
 
         setInterval(drawMatrix, 50);
 
-        // Detect clicks or taps on the canvas
         canvas.addEventListener("click", (e) => {
             const clickedX = e.clientX;
             const clickedY = e.clientY;
@@ -644,43 +692,75 @@
             });
         });
 
-        // Reveal Button Functionality
+        let startTime = Date.now();
         revealButton.addEventListener('click', () => {
-            // Show marquee and play audio
             marquee.style.display = "flex";
             audio.play().catch((error) => {
                 console.error('Audio playback failed:', error);
             });
 
-            // Hide marquee after 5 seconds and show custom alert
             setTimeout(() => {
                 marquee.style.display = "none";
                 alertFoundWords.textContent = foundList.join(", ");
                 customAlert.style.display = "block";
-            }, 5000); // 5 seconds delay
+            }, 5000);
         });
 
-        // Close Custom Alert
+        document.querySelector('.custom-alert button').addEventListener('click', () => {
+            customAlert.style.display = "none";
+
+            const message = document.getElementById('thankYouMessage');
+            message.style.display = 'block';
+            anime({
+                targets: message,
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 1000,
+                easing: 'easeOutExpo'
+            });
+
+            const player = document.getElementById('youtubePlayer');
+            player.style.display = 'block';
+
+            const endTime = Date.now();
+            const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
+            document.getElementById('timeTaken').textContent = timeTaken;
+            document.getElementById('leaderboard').style.display = 'block';
+
+            const scores = JSON.parse(localStorage.getItem('scores') || '[]');
+            scores.push({ time: timeTaken, date: new Date().toLocaleString() });
+            localStorage.setItem('scores', JSON.stringify(scores));
+        });
+
         function closeAlert() {
             customAlert.style.display = "none";
         }
 
-        // Show Zoom Overlay
         function showZoom() {
             zoomOverlay.style.display = "block";
         }
 
-        // Hide Zoom Overlay
         function hideZoom() {
             zoomOverlay.style.display = "none";
         }
 
-        // Hide Zoom Overlay on Click Outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.glitch') && !e.target.closest('.zoom-overlay')) {
                 hideZoom();
             }
         });
+
+        function displayAllScores() {
+            const scores = JSON.parse(localStorage.getItem('scores') || '[]');
+            const leaderboard = document.getElementById('leaderboard');
+            scores.forEach((score, index) => {
+                const scoreElement = document.createElement('p');
+                scoreElement.textContent = `#${index + 1}: ${score.time} seconds (${score.date})`;
+                leaderboard.appendChild(scoreElement);
+            });
+        }
+
+        displayAllScores();
     </script>
 </body>
 </html>
