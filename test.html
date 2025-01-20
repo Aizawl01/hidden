@@ -460,22 +460,42 @@
         /* Thank You Message */
         #thankYouMessage {
             display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             text-align: center;
-            margin-top: 20px;
+            z-index: 6;
+        }
+
+        #thankYouMessage h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: #FF00FF;
+            text-shadow: 0 0 10px #FF00FF, 0 0 20px #00FFFF;
+        }
+
+        #thankYouMessage p {
+            font-size: 1rem;
+            color: #00FFFF;
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #FF00FF;
         }
 
         /* Leaderboard */
         #leaderboard {
             display: none;
-            text-align: center;
-            margin-top: 20px;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            z-index: 6;
             color: #00FFFF;
             font-family: 'Orbitron', sans-serif;
             text-shadow: 0 0 10px #00FFFF, 0 0 20px #FF00FF;
         }
 
         #leaderboard h2 {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             color: #FF00FF;
             text-shadow: 0 0 10px #FF00FF, 0 0 20px #00FFFF;
         }
@@ -522,24 +542,24 @@
 
     <!-- Instructions -->
     <div class="instructions">
-        <b>Tap or click the glowing hidden words as they fall! Once all words are found, click "Reveal" to see how to submit your entry.</b>
+        <b> Tap or click the glowing hidden words as they fall! Once all words are found, click "Reveal" to see how to submit your entry. </b>
     </div>
     
     <!-- Reveal Button -->
-    <button id="reveal">Reveal Instructions</button>
+    <button id="reveal">Reveal Instructions 🚀</button>
     
     <!-- Matrix Background -->
     <canvas id="matrix"></canvas>
 
     <!-- Marquee Transition -->
     <div class="marquee" id="marquee">
-        <h1>Aizawl, you're my heartbeat's song</h1>
+        <h1>Aizawl, you're my heartbeat's song 💓</h1>
     </div>
 
     <!-- Custom Alert Window -->
     <div class="custom-alert" id="customAlert">
-        <h2> Congratulations! </h2>
-        <p>You found all the hidden words: <span id="alertFoundWords"></span>!</p>
+        <h2> 🎉 Congratulations! 🎉 </h2>
+        <p>You found all the hidden words: <span id="alertFoundWords"></span>! 🏆</p>
         <p>
              Next Step:<br>
              Return to the 
@@ -548,27 +568,27 @@
                class="youtube-link"
                onmouseover="this.style.textShadow='0 0 15px #00ffff, 0 0 30px #ff00ff'"
                onmouseout="this.style.textShadow='0 0 5px #00ffff, 0 0 10px #ff00ff'">
-                Aizawl (ACity) Serenade music video on YouTube
+                Aizawl (ACity) Serenade music video on YouTube 🎥
             </a>.<br>
-             Search for the scenes where these hidden words appear.<br>
-             Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.<br>
-            4️⃣ Include your name, WhatsApp number, and GPay number.
+             Search for the scenes where these hidden words appear. 🔍<br>
+            3️⃣ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel. 📲<br>
+            4️⃣ Include your name, WhatsApp number, and GPay number. 📝
         </p>
-        <p>🎁 Winners: If multiple entries are received, we’ll conduct a lucky draw!</p>
+        <p>🎁 Winners: If multiple entries are received, we’ll conduct a lucky draw! 🍀</p>
         <p>🍀 Good luck, and thank you for playing! 🚀</p>
-        <button onclick="closeAlert()">OK</button>
+        <button onclick="closeAlert()">OK 👍</button>
     </div>
 
     <!-- Thank You Message -->
     <div id="thankYouMessage">
-        <h2>Thank You for Playing!</h2>
-        <p>We hope you enjoyed the challenge. Stay tuned for more!</p>
+        <h2>🎮 Thank You for Playing! 🎮</h2>
+        <p>We hope you enjoyed the challenge. Stay tuned for more! 🚀</p>
     </div>
 
     <!-- Leaderboard -->
     <div id="leaderboard">
-        <h2>Your Score</h2>
-        <p>Time Taken: <span id="timeTaken">0</span> seconds</p>
+        <h2>🏆 Your Score 🏆</h2>
+        <p>Time Taken: <span id="timeTaken">0</span> seconds ⏱️</p>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
@@ -762,7 +782,7 @@
             const leaderboard = document.getElementById('leaderboard');
             scores.forEach((score, index) => {
                 const scoreElement = document.createElement('p');
-                scoreElement.textContent = `#${index + 1}: ${score.time} seconds (${score.date})`;
+                scoreElement.textContent = `#${index + 1}: ${score.time} seconds (${score.date}) ⏱️`;
                 leaderboard.appendChild(scoreElement);
             });
         }
