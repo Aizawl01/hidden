@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Khiangtevillain AI: Hidden Words Challenge</title>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Source+Code+Pro:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -378,6 +377,20 @@
                 font-size: 1rem; /* Larger font for desktop */
             }
         }
+
+        /* ONLY CHANGE: YouTube Link Styling */
+        .youtube-link {
+            color: #00ffff; /* Neon cyan */
+            text-decoration: none;
+            font-weight: bold;
+            text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff;
+            transition: all 0.3s ease;
+        }
+
+        .youtube-link:hover {
+            color: #ff00ff; /* Neon magenta */
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+        }
     </style>
 </head>
 <body>
@@ -423,8 +436,15 @@
         <h2> Congratulations! </h2>
         <p>You found all the hidden words: <span id="alertFoundWords"></span>!</p>
         <p>
-            📑 Next Step:<br>
-            1️⃣ Return to the <a href="https://youtu.be/LQm_XCw_I08?si=x69oU5h-J8Y2rBvE" target="_blank" class="youtube-link">Aizawl (ACity) Serenade music video on YouTube</a>.<br>.
+             Next Step:<br>
+            1️⃣ Return to the 
+            <a href="https://youtu.be/LQm_XCw_I08?si=x69oU5h-J8Y2rBvE" 
+               target="_blank" 
+               class="youtube-link"
+               onmouseover="this.style.textShadow='0 0 15px #00ffff, 0 0 30px #ff00ff'"
+               onmouseout="this.style.textShadow='0 0 5px #00ffff, 0 0 10px #ff00ff'">
+                Aizawl (ACity) Serenade music video on YouTube
+            </a>.<br>
             2️⃣ Search for the scenes where these hidden words appear.<br>
             3️⃣ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.<br>
             4️⃣ Include your name, WhatsApp number, and GPay number.
