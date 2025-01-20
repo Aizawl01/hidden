@@ -464,18 +464,37 @@
             margin-top: 20px;
         }
 
-        /* YouTube Player */
-        #youtubePlayer {
-            display: none;
-            text-align: center;
-            margin-top: 20px;
-        }
-
         /* Leaderboard */
         #leaderboard {
             display: none;
             text-align: center;
             margin-top: 20px;
+            color: #00FFFF;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px #00FFFF, 0 0 20px #FF00FF;
+        }
+
+        #leaderboard h2 {
+            font-size: 1.5rem;
+            color: #FF00FF;
+            text-shadow: 0 0 10px #FF00FF, 0 0 20px #00FFFF;
+        }
+
+        #leaderboard p {
+            font-size: 1rem;
+            color: #00FFFF;
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #FF00FF;
+        }
+
+        /* Dynamic Background Change */
+        @keyframes dynamicBackground {
+            0% { background: linear-gradient(90deg, #FF00FF, #00FFFF); }
+            50% { background: linear-gradient(90deg, #00FFFF, #FF00FF); }
+            100% { background: linear-gradient(90deg, #FF00FF, #00FFFF); }
+        }
+
+        body.completed {
+            animation: dynamicBackground 5s infinite;
         }
     </style>
 </head>
@@ -544,18 +563,6 @@
     <div id="thankYouMessage">
         <h2>Thank You for Playing!</h2>
         <p>We hope you enjoyed the challenge. Stay tuned for more!</p>
-    </div>
-
-    <!-- YouTube Player -->
-    <div id="youtubePlayer">
-        <iframe
-            width="560"
-            height="315"
-            src="https://www.youtube.com/embed/LQm_XCw_I08?autoplay=1&mute=1"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen>
-        </iframe>
     </div>
 
     <!-- Leaderboard -->
@@ -719,9 +726,6 @@
                 easing: 'easeOutExpo'
             });
 
-            const player = document.getElementById('youtubePlayer');
-            player.style.display = 'block';
-
             const endTime = Date.now();
             const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
             document.getElementById('timeTaken').textContent = timeTaken;
@@ -730,6 +734,9 @@
             const scores = JSON.parse(localStorage.getItem('scores') || '[]');
             scores.push({ time: timeTaken, date: new Date().toLocaleString() });
             localStorage.setItem('scores', JSON.stringify(scores));
+
+            // Dynamic Background Change
+            document.body.classList.add('completed');
         });
 
         function closeAlert() {
