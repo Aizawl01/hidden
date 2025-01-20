@@ -127,7 +127,7 @@
         /* Counter Styling */
         .counter {
             position: fixed;
-            top: 120px; /* Adjusted for mobile to avoid overlap */
+            top: 80px; /* Adjusted for mobile */
             width: 100%;
             text-align: center;
             color: #00FFFF;
@@ -139,7 +139,7 @@
         /* Instructions Styling */
         .instructions {
             position: fixed;
-            top: 180px; /* Adjusted for mobile to avoid overlap with revealed words */
+            top: 140px; /* Adjusted for mobile */
             width: 100%;
             text-align: center;
             color: #FFF;
@@ -461,7 +461,7 @@
         #thankYouMessage {
             display: none;
             position: fixed;
-            bottom: 80px; /* Adjusted for mobile */
+            bottom: 100px; /* Adjusted for mobile */
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -472,7 +472,7 @@
             border: 2px solid #FF00FF;
             box-shadow: 0 0 20px #FF00FF;
             width: 90%; /* Adjusted for mobile */
-            max-width: 400px; /* Adjusted for mobile */
+            max-width: 300px; /* Adjusted for mobile */
         }
 
         #thankYouMessage h2 {
@@ -492,9 +492,10 @@
         #leaderboard {
             display: none;
             position: fixed;
-            top: 20px; /* Adjusted for mobile */
-            right: 20px; /* Adjusted for mobile */
-            text-align: right;
+            top: 200px; /* Adjusted for mobile */
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
             z-index: 7; /* Higher z-index to ensure it appears above other elements */
             color: #00FFFF;
             font-family: 'Orbitron', sans-serif;
@@ -505,7 +506,7 @@
             border: 2px solid #FF00FF;
             box-shadow: 0 0 20px #FF00FF;
             width: 90%; /* Adjusted for mobile */
-            max-width: 200px; /* Adjusted for mobile */
+            max-width: 300px; /* Adjusted for mobile */
         }
 
         #leaderboard h2 {
@@ -550,10 +551,11 @@
             }
 
             #leaderboard {
-                top: 10px; /* Adjusted for mobile */
-                right: 10px; /* Adjusted for mobile */
+                top: 200px; /* Adjusted for mobile */
+                left: 50%;
+                transform: translateX(-50%);
                 width: 90%; /* Adjusted for mobile */
-                max-width: 150px; /* Adjusted for mobile */
+                max-width: 300px; /* Adjusted for mobile */
             }
         }
     </style>
@@ -586,14 +588,14 @@
     </div>
     
     <!-- Reveal Button -->
-    <button id="reveal">Reveal Instructions</button>
+    <button id="reveal">Reveal Instructions </button>
     
     <!-- Matrix Background -->
     <canvas id="matrix"></canvas>
 
     <!-- Marquee Transition -->
     <div class="marquee" id="marquee">
-        <h1>Aizawl, you're my heartbeat's song </h1>
+        <h1>Aizawl, you're my heartbeat's song 💓</h1>
     </div>
 
     <!-- Custom Alert Window -->
