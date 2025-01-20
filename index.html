@@ -342,7 +342,7 @@
         }
 
         .marquee h1 {
-            animation: flicker 1.5s infinite;
+            animation: flicker 1.5s infinite, glow-beat 0.5s infinite alternate;
             font-family: 'Orbitron', sans-serif;
             font-size: 6vw; /* Adjusted for mobile */
             text-align: center;
@@ -356,6 +356,15 @@
             }
             20%, 24%, 55% {
                 opacity: 0.4;
+            }
+        }
+
+        @keyframes glow-beat {
+            0% {
+                text-shadow: 0 0 10px #FFF, 0 0 20px #00FFFF, 0 0 30px #FF00FF;
+            }
+            100% {
+                text-shadow: 0 0 20px #FFF, 0 0 40px #00FFFF, 0 0 60px #FF00FF;
             }
         }
 
@@ -447,6 +456,76 @@
             50% { opacity: 0.5; text-shadow: 0 0 10px #ff00ff; }
             100% { opacity: 1; text-shadow: 0 0 5px #00ffff; }
         }
+
+        /* Thank You Message */
+        #thankYouMessage {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 7; /* Higher z-index to ensure it appears above other elements */
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #FF00FF;
+            box-shadow: 0 0 20px #FF00FF;
+        }
+
+        #thankYouMessage h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: #FF00FF;
+            text-shadow: 0 0 10px #FF00FF, 0 0 20px #00FFFF;
+        }
+
+        #thankYouMessage p {
+            font-size: 1rem;
+            color: #00FFFF;
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #FF00FF;
+        }
+
+        /* Leaderboard */
+        #leaderboard {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            text-align: right;
+            z-index: 7; /* Higher z-index to ensure it appears above other elements */
+            color: #00FFFF;
+            font-family: 'Orbitron', sans-serif;
+            text-shadow: 0 0 10px #00FFFF, 0 0 20px #FF00FF;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #FF00FF;
+            box-shadow: 0 0 20px #FF00FF;
+        }
+
+        #leaderboard h2 {
+            font-size: 1.2rem;
+            color: #FF00FF;
+            text-shadow: 0 0 10px #FF00FF, 0 0 20px #00FFFF;
+        }
+
+        #leaderboard p {
+            font-size: 1rem;
+            color: #00FFFF;
+            text-shadow: 0 0 5px #00FFFF, 0 0 10px #FF00FF;
+        }
+
+        /* Dynamic Background Change */
+        @keyframes dynamicBackground {
+            0% { background: linear-gradient(90deg, #FF00FF, #00FFFF); }
+            50% { background: linear-gradient(90deg, #00FFFF, #FF00FF); }
+            100% { background: linear-gradient(90deg, #FF00FF, #00FFFF); }
+        }
+
+        body.completed {
+            animation: dynamicBackground 5s infinite;
+        }
     </style>
 </head>
 <body>
@@ -473,7 +552,7 @@
 
     <!-- Instructions -->
     <div class="instructions">
-        <b>Tap or click the glowing hidden words as they fall! Once all words are found, click "Reveal" to see how to submit your entry.</b>
+        <b> Tap or click the glowing hidden words as they fall! Once all words are found, click "Reveal" to see how to submit your entry. </b>
     </div>
     
     <!-- Reveal Button -->
@@ -484,13 +563,13 @@
 
     <!-- Marquee Transition -->
     <div class="marquee" id="marquee">
-        <h1>Aizawl, you're my heartbeat's song</h1>
+        <h1>Aizawl, you're my heartbeat's song </h1>
     </div>
 
     <!-- Custom Alert Window -->
     <div class="custom-alert" id="customAlert">
-        <h2> Congratulations! </h2>
-        <p>You found all the hidden words: <span id="alertFoundWords"></span>!</p>
+        <h2> 🎉 Congratulations! 🎉 </h2>
+        <p>You found all the hidden words: <span id="alertFoundWords"></span>! 🏆</p>
         <p>
              Next Step:<br>
              Return to the 
@@ -499,17 +578,30 @@
                class="youtube-link"
                onmouseover="this.style.textShadow='0 0 15px #00ffff, 0 0 30px #ff00ff'"
                onmouseout="this.style.textShadow='0 0 5px #00ffff, 0 0 10px #ff00ff'">
-                Aizawl (ACity) Serenade music video on YouTube
+                Aizawl (ACity) Serenade music video on YouTube 🎥
             </a>.<br>
-            2️⃣ Search for the scenes where these hidden words appear.<br>
-            3️⃣ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel.<br>
-            4️⃣ Include your name, WhatsApp number, and GPay number.
+             Search for the scenes where these hidden words appear. 🔍<br>
+            3️⃣ Screenshot all 5 words from the video and post them on the Khiangtevillain AI Telegram channel. 📲<br>
+            4️⃣ Include your name, WhatsApp number, and GPay number. 📝
         </p>
-        <p>🎁 Winners: If multiple entries are received, we’ll conduct a lucky draw!</p>
+        <p>🎁 Winners: If multiple entries are received, we’ll conduct a lucky draw! 🍀</p>
         <p>🍀 Good luck, and thank you for playing! 🚀</p>
-        <button onclick="closeAlert()">OK</button>
+        <button onclick="closeAlert()">OK 👍</button>
     </div>
 
+    <!-- Thank You Message -->
+    <div id="thankYouMessage">
+        <h2>🎮 Thank You for Playing! 🎮</h2>
+        <p>We hope you enjoyed the challenge. Stay tuned for more! 🚀</p>
+    </div>
+
+    <!-- Leaderboard -->
+    <div id="leaderboard">
+        <h2>🏆 Your Score 🏆</h2>
+        <p>Time Taken: <span id="timeTaken">0</span> seconds ⏱️</p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <script>
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
@@ -518,7 +610,11 @@
         const customAlert = document.getElementById('customAlert');
         const alertFoundWords = document.getElementById('alertFoundWords');
         const zoomOverlay = document.getElementById('zoomOverlay');
+        const thankYouMessage = document.getElementById('thankYouMessage');
+        const leaderboard = document.getElementById('leaderboard');
         const audio = new Audio('aizawl.mp3');
+        audio.loop = true; // Ensure the audio loops indefinitely
+
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -539,15 +635,31 @@
             found: false,
         }));
 
+        // Beat timings from beats.txt
+        const beatTimings = [
+            0.359909, 0.917188, 1.497687, 2.089796, 2.681905, 3.274014, 3.866122, 4.469841,
+            5.061950, 5.654059, 6.246168, 6.838277, 7.441995, 8.034104, 8.626213, 9.218322,
+            9.798821, 10.402540, 10.994649, 11.598367, 12.190476, 12.782585, 13.374694,
+            13.966803, 14.558912, 15.162630, 15.754739, 16.346848, 16.938957, 17.542676,
+            18.134785, 18.726893, 19.319002, 19.911111
+        ];
+        let currentBeatIndex = 0;
+
+        let mouseX = 0, mouseY = 0;
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
         function drawMatrix() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.font = `${fontSize}px 'Source Code Pro', monospace`;
 
-            // Draw falling characters
             drops.forEach((y, x) => {
                 const text = chars[Math.floor(Math.random() * chars.length)];
-                const neonColor = `hsl(${Math.random() * 360}, 100%, 75%)`;
+                const distance = Math.sqrt((x * fontSize - mouseX) ** 2 + (y * fontSize - mouseY) ** 2);
+                const neonColor = `hsl(${distance % 360}, 100%, 75%)`;
 
                 ctx.fillStyle = neonColor;
                 ctx.shadowColor = neonColor;
@@ -562,7 +674,6 @@
                 drops[x]++;
             });
 
-            // Draw hidden words only if marquee is not displayed
             if (marquee.style.display !== "flex") {
                 hiddenWordPositions.forEach((hw) => {
                     if (!hw.found) {
@@ -582,9 +693,20 @@
             }
         }
 
+        function animateMarquee() {
+            const currentTime = audio.currentTime;
+
+            if (currentBeatIndex < beatTimings.length && currentTime >= beatTimings[currentBeatIndex]) {
+                const hue = (currentBeatIndex / beatTimings.length) * 360;
+                marquee.style.background = `linear-gradient(90deg, hsl(${hue}, 100%, 50%), hsl(${(hue + 180) % 360}, 100%, 50%))`;
+                currentBeatIndex++;
+            }
+
+            requestAnimationFrame(animateMarquee);
+        }
+
         setInterval(drawMatrix, 50);
 
-        // Detect clicks or taps on the canvas
         canvas.addEventListener("click", (e) => {
             const clickedX = e.clientX;
             const clickedY = e.clientY;
@@ -609,43 +731,77 @@
             });
         });
 
-        // Reveal Button Functionality
+        let startTime = Date.now();
         revealButton.addEventListener('click', () => {
-            // Show marquee and play audio
             marquee.style.display = "flex";
             audio.play().catch((error) => {
                 console.error('Audio playback failed:', error);
             });
 
-            // Hide marquee after 5 seconds and show custom alert
             setTimeout(() => {
                 marquee.style.display = "none";
                 alertFoundWords.textContent = foundList.join(", ");
                 customAlert.style.display = "block";
-            }, 5000); // 5 seconds delay
+            }, 5000);
         });
 
-        // Close Custom Alert
+        document.querySelector('.custom-alert button').addEventListener('click', () => {
+            customAlert.style.display = "none";
+
+            thankYouMessage.style.display = 'block';
+            anime({
+                targets: thankYouMessage,
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 1000,
+                easing: 'easeOutExpo'
+            });
+
+            const endTime = Date.now();
+            const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
+            document.getElementById('timeTaken').textContent = timeTaken;
+            leaderboard.style.display = 'block';
+
+            const scores = JSON.parse(localStorage.getItem('scores') || '[]');
+            scores.push({ time: timeTaken, date: new Date().toLocaleString() });
+            localStorage.setItem('scores', JSON.stringify(scores));
+
+            // Change "Reveal Instructions" button to "Play Again"
+            revealButton.textContent = "Play Again 🎮";
+            revealButton.onclick = () => location.reload(); // Reset the game
+
+            // Dynamic Background Change
+            document.body.classList.add('completed');
+        });
+
         function closeAlert() {
             customAlert.style.display = "none";
         }
 
-        // Show Zoom Overlay
         function showZoom() {
             zoomOverlay.style.display = "block";
         }
 
-        // Hide Zoom Overlay
         function hideZoom() {
             zoomOverlay.style.display = "none";
         }
 
-        // Hide Zoom Overlay on Click Outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.glitch') && !e.target.closest('.zoom-overlay')) {
                 hideZoom();
             }
         });
+
+        function displayAllScores() {
+            const scores = JSON.parse(localStorage.getItem('scores') || '[]');
+            scores.forEach((score, index) => {
+                const scoreElement = document.createElement('p');
+                scoreElement.textContent = `#${index + 1}: ${score.time} seconds (${score.date}) ⏱️`;
+                leaderboard.appendChild(scoreElement);
+            });
+        }
+
+        displayAllScores();
     </script>
 </body>
 </html>
