@@ -1,6 +1,6 @@
 {
-  "name": "PictureMe",
-  "description": "An advanced AI photo studio powered by Gemini. Upload a photo and transform it with creative themes like Time Traveler, Style Lookbook, Pro Headshots, and more, with customizable options for each.",
+  "name": "khiangtevillain photo transfromer",
+  "description": "An advanced AI photo studio powered by Gemini. Upload a photo and transform it with creative themes like mizo traditional attire,Time Traveler, Style Lookbook, Pro Headshots, and more, with customizable options for each.",
   "requestFramePermissions": [
     "camera"
   ]

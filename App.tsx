@@ -1,15 +1,16 @@
+
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { GoogleGenAI, Modality } from '@google/genai';
 
+// WARNING: For this demo, the API key is hardcoded. This is NOT recommended for production applications.
+// Anyone who can view your website's source code will be able to see this key.
+const API_KEY = "AIzaSyC4hkmqihimopHTQBZ8sZa-zbq6ZtRnnms";
 
-if (!process.env.API_KEY) {
-    throw new Error("API_KEY environment variable must be set.");
-}
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 declare const JSZip: any;
 
-// --- Helper Functions ---
+// --- Helper Functions (don't require AI instance) ---
 
 const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -17,57 +18,6 @@ const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) 
     reader.onload = () => resolve(reader.result as string);
     reader.onerror = error => reject(error);
 });
-
-const generateDynamicPrompt = async (themeDescription: string): Promise<string> => {
-    try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: `Generate a short, creative, and detailed style description for a photoshoot based on this theme: "${themeDescription}". The description should be a single sentence and sound cool.`,
-        });
-        return response.text.trim();
-    } catch (error) {
-        console.error("Error generating dynamic prompt:", error);
-        return "A retro 80s studio background with laser beams, neon geometric shapes, fog, and dramatic backlighting.";
-    }
-};
-
-const generateImageWithRetry = async (modelInstruction: string, imageWithoutPrefix: string, totalAttempts = 3): Promise<string> => {
-    let lastError: Error | undefined;
-    for (let attempt = 1; attempt <= totalAttempts; attempt++) {
-        try {
-            const imagePart = { inlineData: { data: imageWithoutPrefix, mimeType: 'image/png' } };
-            const textPart = { text: modelInstruction };
-
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash-image-preview',
-                contents: { parts: [textPart, imagePart] },
-                config: { responseModalities: [Modality.IMAGE, Modality.TEXT] },
-            });
-
-            if (response.candidates && response.candidates.length > 0) {
-              for (const part of response.candidates[0].content.parts) {
-                if (part.inlineData && part.inlineData.data) {
-                  return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                }
-              }
-            }
-            
-            lastError = new Error("API returned no image data.");
-            console.warn(`Attempt ${attempt}/${totalAttempts}: ${lastError.message}`);
-
-        } catch (error) {
-            lastError = error as Error;
-            console.error(`Attempt ${attempt}/${totalAttempts} failed:`, error);
-        }
-
-        if (attempt < totalAttempts) {
-            const delay = 1000 * Math.pow(2, attempt - 1);
-            await new Promise(res => setTimeout(res, delay));
-        }
-    }
-    throw new Error(`Image generation failed after ${totalAttempts} attempts. Last error: ${lastError?.message || 'Unknown error'}`);
-};
-
 
 const cropImage = (imageUrl: string, aspectRatio: string): Promise<string> => new Promise((resolve, reject) => {
     const img = new Image();
@@ -411,6 +361,62 @@ const App: React.FC = () => {
     const [headshotExpression, setHeadshotExpression] = useState('Friendly Smile');
     const [headshotPose, setHeadshotPose] = useState('Forward');
 
+    // --- API Helper Functions ---
+    const generateDynamicPrompt = useCallback(async (themeDescription: string): Promise<string> => {
+        try {
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: `Generate a short, creative, and detailed style description for a photoshoot based on this theme: "${themeDescription}". The description should be a single sentence and sound cool.`,
+            });
+            return response.text.trim();
+        } catch (error) {
+            console.error("Error generating dynamic prompt:", error);
+            return "A retro 80s studio background with laser beams, neon geometric shapes, fog, and dramatic backlighting.";
+        }
+    }, []);
+
+    const generateImageWithRetry = useCallback(async (modelInstruction: string, imageWithoutPrefix: string, totalAttempts = 3): Promise<string> => {
+        let lastError: Error | undefined;
+        for (let attempt = 1; attempt <= totalAttempts; attempt++) {
+            try {
+                const imagePart = { inlineData: { data: imageWithoutPrefix, mimeType: 'image/png' } };
+                const textPart = { text: modelInstruction };
+
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash-image-preview',
+                    contents: { parts: [textPart, imagePart] },
+                    config: { responseModalities: [Modality.IMAGE, Modality.TEXT] },
+                });
+
+                if (response.candidates && response.candidates.length > 0) {
+                  for (const part of response.candidates[0].content.parts) {
+                    if (part.inlineData && part.inlineData.data) {
+                      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    }
+                  }
+                }
+                
+                lastError = new Error("API returned no image data.");
+                console.warn(`Attempt ${attempt}/${totalAttempts}: ${lastError.message}`);
+
+            } catch (error) {
+                lastError = error as Error;
+                console.error(`Attempt ${attempt}/${totalAttempts} failed:`, error);
+                if (error instanceof Error && error.message.includes('API key not valid')) {
+                    setError("The hardcoded API Key is not valid. Please update it in the code.");
+                    throw error;
+                }
+            }
+
+            if (attempt < totalAttempts) {
+                const delay = 1000 * Math.pow(2, attempt - 1);
+                await new Promise(res => setTimeout(res, delay));
+            }
+        }
+        throw new Error(`Image generation failed after ${totalAttempts} attempts. Last error: ${lastError?.message || 'Unknown error'}`);
+    }, []);
+
+
     const handleColorChange = (index: number, newColor: string) => setHairColors(p => p.map((c, i) => i === index ? newColor : c));
     const addHairColor = () => { if (hairColors.length < 2) setHairColors(p => [...p, '#ff00ff']); };
     const removeHairColor = (index: number) => setHairColors(p => p.filter((_, i) => i !== index));
@@ -461,7 +467,7 @@ const App: React.FC = () => {
         headshots: { name: "Pro Headshots", description: "Professional profile pictures.", icon: '💼', isPolaroid: false, prompts: [{ id: 'Business Suit', base: 'wearing a dark business suit with a crisp white shirt' }, { id: 'Smart Casual', base: 'wearing a smart-casual knit sweater over a collared shirt' }, { id: 'Creative Pro', base: 'wearing a dark turtleneck' }, { id: 'Corporate Look', base: 'wearing a light blue button-down shirt' }, { id: 'Bright & Modern', base: 'wearing a colorful blazer' }, { id: 'Relaxed', base: 'wearing a simple, high-quality t-shirt under a casual jacket' }] },
     }), []);
 
-    const regenerateImageAtIndex = async (imageIndex: number) => {
+    const regenerateImageAtIndex = useCallback(async (imageIndex: number) => {
         if (!generatedImages[imageIndex]) return;
         setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'pending' } : img));
         setError(null);
@@ -486,7 +492,7 @@ const App: React.FC = () => {
             setError(`Oops! Regeneration for "${prompt.id}" failed. Please try again.`);
             setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'failed' } : img));
         }
-    };
+    }, [generatedImages, template, uploadedImage, templates, selectedHairStyles, isCustomHairActive, customHairStyle, headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors, generateImageWithRetry]);
     
     const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -510,7 +516,7 @@ const App: React.FC = () => {
         setError(null);
     };
 
-    const handleGenerateClick = async () => {
+    const handleGenerateClick = useCallback(async () => {
         if (!uploadedImage || !template) {
             setError(!uploadedImage ? "Please upload a photo!" : "Please select a theme!");
             return;
@@ -569,10 +575,13 @@ const App: React.FC = () => {
                 setGeneratedImages(prev => prev.map((img, index) => index === i ? { ...img, status: 'success', imageUrl } : img));
             } catch (err) {
                 setGeneratedImages(prev => prev.map((img, index) => index === i ? { ...img, status: 'failed' } : img));
+                 if (err instanceof Error && err.message.includes('API key not valid')) {
+                    break; 
+                }
             }
         }
         setIsLoading(false);
-    };
+    }, [uploadedImage, template, templates, lookbookStyle, customLookbookStyle, selectedHairStyles, isCustomHairActive, customHairStyle, hairColors, headshotExpression, headshotPose, generateDynamicPrompt, generateImageWithRetry]);
 
     const triggerDownload = (href: string, fileName: string) => {
         const link = document.createElement('a');
