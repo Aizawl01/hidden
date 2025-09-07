@@ -902,8 +902,10 @@ const App: React.FC = () => {
                                     {isLoading && <div className="w-full max-w-4xl mx-auto mb-8 text-center"><div className="bg-slate-800 rounded-full h-3 overflow-hidden shadow-md"><div className="bg-gradient-to-r from-cyan-400 to-pink-500 h-3 rounded-full transition-all duration-500" style={{width: `${progress}%`}}></div></div><p className="text-slate-400 mt-4 text-sm">Please keep this window open while your photos are being generated.</p></div>}
                                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
                                         {generatedImages.map((img, index) => {
-                                            const activeTemplate = templates[template!] || {};
-                                            const isPolaroid = activeTemplate.isPolaroid;
+                                            // FIX: Replaced unsafe property access on a potentially empty object with
+                                            // optional chaining and a nullish coalescing operator. This resolves the
+                                            // TypeScript error and provides a safe fallback value for `isPolaroid`.
+                                            const isPolaroid = templates[template!]?.isPolaroid ?? false;
                                             const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration'].includes(template!);
                                             switch (img.status) {
                                                 case 'success': return <PhotoDisplay key={`${img.id}-${index}-s`} era={img.id} imageUrl={img.imageUrl!} onDownload={handleDownloadRequest} onRegenerate={() => regenerateImageAtIndex(index)} isPolaroid={isPolaroid} index={index} showLabel={showLabel} />;
