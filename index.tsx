@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import ReactDOM from 'react-dom/client';
-import { GoogleGenAI, Modality } from '@google/genai';
+
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'https://esm.sh/react@19.1.1';
+import ReactDOM from 'https://esm.sh/react-dom@19.1.1/client';
+import { GoogleGenAI, Modality } from 'https://esm.sh/@google/genai@1.17.0';
 
 // WARNING: For this demo, the API key is hardcoded. This is NOT recommended for production applications.
 // Anyone who can view your website's source code will be able to see this key.
@@ -49,6 +50,40 @@ const cropImage = (imageUrl: string, aspectRatio: string): Promise<string> => ne
         canvas.width = sourceWidth;
         canvas.height = sourceHeight;
         ctx.drawImage(img, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, sourceWidth, sourceHeight);
+        resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = (err) => reject(err);
+});
+
+const addWatermark = (imageUrl: string): Promise<string> => new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = imageUrl;
+    img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error("Canvas context not available for watermarking"));
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        // Watermark style
+        const padding = img.width * 0.025;
+        const fontSize = Math.max(12, Math.floor(img.width * 0.035));
+        ctx.font = `600 ${fontSize}px Inter, sans-serif`;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        
+        // Add a subtle shadow for better visibility
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+        ctx.shadowBlur = 5;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
+        
+        ctx.fillText('[IG : @KHIANGTE.VILLAIN]', canvas.width - padding, canvas.height - padding);
+        
         resolve(canvas.toDataURL('image/png'));
     };
     img.onerror = (err) => reject(err);
@@ -139,6 +174,10 @@ const getModelInstruction = (template: string, prompt: { id: string; base: strin
             return `${baseInstruction} Transform the person into a miniature figurine based on the following description, placing it in a realistic environment: ${prompt.base}. The final image should look like a real photograph of a physical object.`;
         case 'mizoAttire':
              return `${baseInstruction} Clothe the person in a traditional Mizo garment, specifically ${prompt.base}. The background should be a natural, scenic view of the Mizo hills. The final image should be a respectful and authentic portrait.`;
+        case 'photoRestoration':
+            return `You are a professional photo restoration expert. ${baseInstruction} Based on the user's request, perform the following task on the provided photo: "${prompt.base}". Do not add new elements or drastically alter the original composition. The goal is to restore and enhance, not to create something new.`;
+        case 'pixarStyle':
+            return `${baseInstruction} Transform the person into an expressive 3D character in the iconic style of Pixar animation. The character should have exaggerated but appealing features, soft lighting, and detailed textures. Place this character in the following scene: ${prompt.base}`;
         default:
             return `Create an image based on the reference photo and this prompt: ${prompt.base}`;
     }
@@ -153,6 +192,8 @@ const IconDownload = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" v
 const IconCamera = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.776 48.776 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>;
 const IconPlus = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>;
 const IconX = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>;
+const IconInstagram = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664-4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.802C9.042 3.965 8.72 3.978 7.474 4.034c-2.43.111-3.64 1.317-3.75 3.75-.056 1.246-.068 1.568-.068 4.216s.012 2.97.068 4.216c.11 2.43 1.317 3.64 3.75 3.75 1.246.056 1.568.068 4.216.068s2.97-.012 4.216-.068c2.43-.11 3.64-1.317 3.75-3.75.056-1.246.068-1.568-.068-4.216s-.012-2.97-.068-4.216c-.11-2.43-1.317-3.64-3.75-3.75-1.246-.056-1.568-.068-4.216-.068zm0 5.438c-2.273 0-4.106 1.833-4.106 4.106s1.833 4.106 4.106 4.106 4.106-1.833 4.106-4.106-1.833-4.106-4.106-4.106zm0 6.55c-1.348 0-2.444-1.096-2.444-2.444s1.096-2.444 2.444-2.444 2.444 1.096 2.444 2.444-1.096 2.444-2.444 2.444zM16.949 6.05a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"></path></svg>;
+const IconYouTube = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path></svg>;
 
 // --- React Components ---
 
@@ -339,6 +380,19 @@ const TemplateCard: React.FC<{id: string, name: string, icon: string, descriptio
 );
 
 
+// Fix: Defined types for the templates object to resolve errors where properties
+// on the `data` variable were not accessible due to being typed as 'unknown'.
+type TemplatePrompt = { id: string; base: string; };
+type TemplateData = {
+    name: string;
+    description: string;
+    icon: string;
+    isPolaroid: boolean;
+    prompts: TemplatePrompt[];
+    styles?: string[];
+};
+
+
 const App: React.FC = () => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [generatedImages, setGeneratedImages] = useState<{ id: string, status: 'pending' | 'success' | 'failed', imageUrl: string | null }[]>([]);
@@ -360,6 +414,85 @@ const App: React.FC = () => {
     const [customLookbookStyle, setCustomLookbookStyle] = useState('');
     const [headshotExpression, setHeadshotExpression] = useState('Friendly Smile');
     const [headshotPose, setHeadshotPose] = useState('Forward');
+
+    useEffect(() => {
+        const canvas = document.getElementById('background-canvas') as HTMLCanvasElement;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        let particles: { x: number; y: number; vx: number; vy: number; radius: number }[] = [];
+        let animationFrameId: number;
+
+        const setup = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            particles = [];
+            const particleCount = Math.floor((canvas.width * canvas.height) / 15000);
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: Math.random() * 0.4 - 0.2,
+                    vy: Math.random() * 0.4 - 0.2,
+                    radius: Math.random() * 1.5 + 0.5,
+                });
+            }
+        };
+
+        const draw = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(236, 72, 153, 0.5)';
+                ctx.fill();
+            });
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        const opacity = 1 - (dist / 120);
+                        ctx.strokeStyle = `rgba(34, 211, 238, ${opacity * 0.3})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                    }
+                }
+            }
+            animationFrameId = requestAnimationFrame(draw);
+        };
+        
+        setup();
+        draw();
+        
+        const handleResize = () => {
+             cancelAnimationFrame(animationFrameId);
+             setup();
+             draw();
+        };
+        
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            cancelAnimationFrame(animationFrameId);
+        };
+    }, []);
 
     // --- API Helper Functions ---
     const generateDynamicPrompt = useCallback(async (themeDescription: string): Promise<string> => {
@@ -438,7 +571,35 @@ const App: React.FC = () => {
         });
     };
 
-    const templates = useMemo(() => ({
+    const templates: { [key: string]: TemplateData } = useMemo(() => ({
+        photoRestoration: {
+            name: 'Photo Restoration',
+            description: 'Repair and enhance old photographs.',
+            icon: '✨',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Colorize', base: 'Colorize this black and white photo with realistic, natural colors.' },
+                { id: 'Repair Damage', base: 'Repair physical damage like cracks, scratches, dust, and tears from this photo.' },
+                { id: 'Enhance Clarity', base: 'Improve the overall sharpness, clarity, and focus of this slightly blurry photo.' },
+                { id: 'Full Restore', base: 'Perform a full restoration: repair damage, colorize if B&W, and enhance clarity.' },
+                { id: 'Gentle Update', base: 'Gently enhance the colors and lighting to make the photo look more vibrant, without changing the vintage feel.' },
+                { id: 'Fix Fading', base: 'Restore faded colors and contrast to their original vibrancy.' }
+            ]
+        },
+        pixarStyle: {
+            name: 'Pixar-style Me',
+            description: 'Become a 3D animated character.',
+            icon: '🧸',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Adventurer', base: 'as a brave adventurer in a lush, magical jungle.' },
+                { id: 'Scientist', base: 'as a quirky scientist in a chaotic, colorful laboratory.' },
+                { id: 'Musician', base: 'as a passionate musician on a brightly lit stage.' },
+                { id: 'Chef', base: 'as a cheerful chef in a warm, bustling kitchen.' },
+                { id: 'Artist', base: 'as a creative artist in a messy, paint-splattered studio.' },
+                { id: 'Astronaut', base: 'as a curious astronaut floating in a star-filled galaxy.' }
+            ]
+        },
         mizoAttire: { name: 'Mizo Traditional Attire', description: 'Elegant portraits in traditional Mizo garments.', icon: '🌺', isPolaroid: false, prompts: [
             { id: 'Puanchei', base: 'a Puanchei, the most colourful Mizo puan, worn in the traditional style by a woman' },
             { id: 'Tawlhlohpuan', base: 'a Tawlhlohpuan, a puan of courage, draped valiantly over the shoulder of a man' },
@@ -487,7 +648,8 @@ const App: React.FC = () => {
             if (!uploadedImage) throw new Error("No uploaded image found for regeneration.");
             const modelInstruction = getModelInstruction(template!, prompt, { headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors });
             const imageUrl = await generateImageWithRetry(modelInstruction, uploadedImage.split(',')[1]);
-            setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'success', imageUrl } : img));
+            const watermarkedImageUrl = await addWatermark(imageUrl);
+            setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'success', imageUrl: watermarkedImageUrl } : img));
         } catch (err) {
             setError(`Oops! Regeneration for "${prompt.id}" failed. Please try again.`);
             setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'failed' } : img));
@@ -572,7 +734,8 @@ const App: React.FC = () => {
             try {
                 const modelInstruction = getModelInstruction(template, p, { headshotExpression, headshotPose, currentAlbumStyle: dynamicStyleForAlbum, lookbookStyle, customLookbookStyle, hairColors });
                 const imageUrl = await generateImageWithRetry(modelInstruction, imageWithoutPrefix);
-                setGeneratedImages(prev => prev.map((img, index) => index === i ? { ...img, status: 'success', imageUrl } : img));
+                const watermarkedImageUrl = await addWatermark(imageUrl);
+                setGeneratedImages(prev => prev.map((img, index) => index === i ? { ...img, status: 'success', imageUrl: watermarkedImageUrl } : img));
             } catch (err) {
                 setGeneratedImages(prev => prev.map((img, index) => index === i ? { ...img, status: 'failed' } : img));
                  if (err instanceof Error && err.message.includes('API key not valid')) {
@@ -594,7 +757,7 @@ const App: React.FC = () => {
 
     const handleDownloadRequest = async (imageUrl: string, era: string, ratio: string) => {
         try {
-            const shouldAddLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire'].includes(template!);
+            const shouldAddLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration'].includes(template!);
             const framedImageUrl = await createSingleFramedImage(imageUrl, ratio, shouldAddLabel ? era : null);
             triggerDownload(framedImageUrl, `khiangtevillain-ai-${era.toLowerCase().replace(/\s+/g, '-')}.png`);
         } catch (err) {
@@ -665,15 +828,31 @@ const App: React.FC = () => {
         <>
             <CameraModal isOpen={isCameraOpen} onClose={() => setIsCameraOpen(false)} onCapture={handleCaptureConfirm} />
 
-            <div className="bg-slate-950 text-gray-200 min-h-screen flex flex-col items-center p-4 pb-20">
+            <div className="bg-slate-950/0 text-gray-200 min-h-screen flex flex-col items-center p-4 pb-20 relative z-10">
                  <ErrorNotification message={error} onDismiss={() => setError(null)} />
                 
                 <div className="w-full max-w-6xl mx-auto">
                     <header className="text-center my-12 animate-fade-in-down">
-                        <h1 className="text-4xl md:text-5xl font-orbitron text-white tracking-tight uppercase">
-                            Khiangtevillain <span className="text-pink-500">Nano-banana</span>
+                        <h1 
+                            className="text-4xl md:text-5xl font-orbitron tracking-tight uppercase"
+                            style={{
+                                color: '#67e8f9', // cyan-300
+                                textShadow: '0 0 5px #67e8f9, 0 0 10px #67e8f9, 0 0 20px #22d3ee' // cyan-300 and cyan-400 glow
+                            }}
+                        >
+                            KhiangteVillain AI Images Generator
                         </h1>
-                        <p className="mt-4 text-lg text-cyan-300/80">Transform your photos with the power of Gemini AI.</p>
+                        <p className="mt-4 text-lg text-cyan-300/80">Transform your photos with (SOTA) AI model</p>
+                        <div className="flex justify-center gap-x-8 gap-y-4 mt-6 flex-wrap">
+                            <a href="https://www.instagram.com/khiangte.villain" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-300 hover:text-pink-400 transition-colors font-medium">
+                                <IconInstagram />
+                                <span>@khiangte.villain</span>
+                            </a>
+                            <a href="https://www.youtube.com/@khiangtevillainAi" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-300 hover:text-cyan-400 transition-colors font-medium">
+                                <IconYouTube />
+                                <span>@khiangtevillainAi</span>
+                            </a>
+                        </div>
                     </header>
 
                     <main>
@@ -683,7 +862,7 @@ const App: React.FC = () => {
                                 <div>
                                     <h2 className="text-2xl font-semibold mb-6 text-white font-orbitron">1. YOUR PHOTO</h2>
                                     <div className="w-full aspect-square border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center cursor-pointer hover:border-pink-500 transition-colors bg-slate-800/50 overflow-hidden shadow-inner" onClick={() => !uploadedImage && fileInputRef.current?.click()}>
-                                        {isUploading ? <div className="flex flex-col items-center"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-pink-500"></div><p className="text-gray-400 mt-4">Uploading...</p></div> : uploadedImage ? <img src={uploadedImage} alt="Uploaded preview" className="w-full h-full object-cover" /> : <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400"><IconUpload /><p className="mt-4 text-lg text-slate-300">Click to upload a file</p><p className="mt-4 text-sm">or</p><Button onClick={(e) => { e.stopPropagation(); setIsCameraOpen(true); }} className="mt-2"><div className="flex items-center gap-2"><IconCamera /><span>Use Camera</span></div></Button></div>}
+                                        {isUploading ? <div className="flex flex-col items-center"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-pink-500"></div><p className="text-gray-400 mt-4">Uploading...</p></div> : uploadedImage ? <img src={uploadedImage} alt="Uploaded preview" className="w-full h-full object-contain" /> : <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400"><IconUpload /><p className="mt-4 text-lg text-slate-300">Click to upload a file</p><p className="mt-4 text-sm">or</p><Button onClick={(e) => { e.stopPropagation(); setIsCameraOpen(true); }} className="mt-2"><div className="flex items-center gap-2"><IconCamera /><span>Use Camera</span></div></Button></div>}
                                     </div>
                                     {uploadedImage && !isUploading && <div className="flex flex-col sm:flex-row gap-4 mt-4 w-full"><Button onClick={() => fileInputRef.current?.click()} className="flex-1">Change File</Button><Button onClick={() => setIsCameraOpen(true)} className="flex-1"><div className="flex items-center justify-center gap-2"><IconCamera /><span>Use Camera</span></div></Button></div>}
                                      <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/png, image/jpeg" className="hidden" />
@@ -725,7 +904,7 @@ const App: React.FC = () => {
                                         {generatedImages.map((img, index) => {
                                             const activeTemplate = templates[template!] || {};
                                             const isPolaroid = activeTemplate.isPolaroid;
-                                            const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire'].includes(template!);
+                                            const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration'].includes(template!);
                                             switch (img.status) {
                                                 case 'success': return <PhotoDisplay key={`${img.id}-${index}-s`} era={img.id} imageUrl={img.imageUrl!} onDownload={handleDownloadRequest} onRegenerate={() => regenerateImageAtIndex(index)} isPolaroid={isPolaroid} index={index} showLabel={showLabel} />;
                                                 case 'failed': return <ErrorCard key={`${img.id}-${index}-f`} era={img.id} isPolaroid={isPolaroid} onRegenerate={() => regenerateImageAtIndex(index)} showLabel={showLabel} />;
@@ -738,13 +917,9 @@ const App: React.FC = () => {
                             {!isLoading && generatedImages.length > 0 && <div className="text-center mt-16 mb-12 flex flex-col sm:flex-row justify-center items-center gap-6"><Button onClick={handleStartOver}>Start Over</Button><Button onClick={handleAlbumDownloadRequest} primary disabled={isDownloadingAlbum}>{isDownloadingAlbum ? <div className="flex items-center gap-2"><div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div><span>Zipping...</span></div> : <div className="flex items-center gap-2"><IconDownload /><span>Download Album</span></div>}</Button></div>}
                         </div>
                     </main>
-
-                     <footer className="text-center mt-20 pt-10 border-t border-slate-800">
-                        <p className="text-slate-400">Follow Khiangtevillain A.I.</p>
-                        <div className="flex justify-center gap-6 mt-4">
-                            <a href="https://www.youtube.com/@khiangtevillainai" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-pink-500 transition-colors">YouTube</a>
-                            <a href="https://www.instagram.com/khiangte.villain" target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-pink-500 transition-colors">Instagram</a>
-                        </div>
+                    <footer className="text-center mt-16 py-8 border-t border-slate-800 text-slate-500 text-sm animate-fade-in">
+                        <p>copyright khiangtevillain 2025</p>
+                        <p className="mt-1">site is sponsored by J&R business Aizawl, Mizoram</p>
                     </footer>
                 </div>
             </div>
