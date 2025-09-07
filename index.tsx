@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'https://esm.sh/react@19.1.1';
 import ReactDOM from 'https://esm.sh/react-dom@19.1.1/client';
 import { GoogleGenAI, Modality } from 'https://esm.sh/@google/genai@1.17.0';
@@ -414,6 +413,21 @@ const App: React.FC = () => {
     const [customLookbookStyle, setCustomLookbookStyle] = useState('');
     const [headshotExpression, setHeadshotExpression] = useState('Friendly Smile');
     const [headshotPose, setHeadshotPose] = useState('Forward');
+    const [generationCount, setGenerationCount] = useState(10);
+
+    useEffect(() => {
+        const storedCount = localStorage.getItem('generationCount');
+        const storedTimestamp = localStorage.getItem('generationResetTimestamp');
+        const now = new Date().getTime();
+
+        if (storedTimestamp && now > parseInt(storedTimestamp)) {
+            localStorage.removeItem('generationCount');
+            localStorage.removeItem('generationResetTimestamp');
+            setGenerationCount(10);
+        } else if (storedCount !== null) {
+            setGenerationCount(parseInt(storedCount));
+        }
+    }, []);
 
     useEffect(() => {
         const canvas = document.getElementById('background-canvas') as HTMLCanvasElement;
@@ -679,6 +693,10 @@ const App: React.FC = () => {
     };
 
     const handleGenerateClick = useCallback(async () => {
+        if (generationCount <= 0) {
+            setError("You've reached your generation limit for today.");
+            return;
+        }
         if (!uploadedImage || !template) {
             setError(!uploadedImage ? "Please upload a photo!" : "Please select a theme!");
             return;
@@ -697,6 +715,15 @@ const App: React.FC = () => {
         setError(null);
         setGeneratedImages([]);
         
+        const currentTimestamp = localStorage.getItem('generationResetTimestamp');
+        if (!currentTimestamp) {
+            const newResetTimestamp = new Date().getTime() + 24 * 60 * 60 * 1000;
+            localStorage.setItem('generationResetTimestamp', newResetTimestamp.toString());
+        }
+        const newCount = generationCount - 1;
+        setGenerationCount(newCount);
+        localStorage.setItem('generationCount', newCount.toString());
+
         setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 
         const imageWithoutPrefix = uploadedImage.split(',')[1];
@@ -744,7 +771,7 @@ const App: React.FC = () => {
             }
         }
         setIsLoading(false);
-    }, [uploadedImage, template, templates, lookbookStyle, customLookbookStyle, selectedHairStyles, isCustomHairActive, customHairStyle, hairColors, headshotExpression, headshotPose, generateDynamicPrompt, generateImageWithRetry]);
+    }, [uploadedImage, template, templates, lookbookStyle, customLookbookStyle, selectedHairStyles, isCustomHairActive, customHairStyle, hairColors, headshotExpression, headshotPose, generationCount, generateDynamicPrompt, generateImageWithRetry]);
 
     const triggerDownload = (href: string, fileName: string) => {
         const link = document.createElement('a');
@@ -834,11 +861,8 @@ const App: React.FC = () => {
                 <div className="w-full max-w-6xl mx-auto">
                     <header className="text-center my-12 animate-fade-in-down">
                         <h1 
-                            className="text-4xl md:text-5xl font-orbitron tracking-tight uppercase"
-                            style={{
-                                color: '#67e8f9', // cyan-300
-                                textShadow: '0 0 5px #67e8f9, 0 0 10px #67e8f9, 0 0 20px #22d3ee' // cyan-300 and cyan-400 glow
-                            }}
+                            className="glitch-text text-4xl md:text-5xl font-orbitron tracking-tight uppercase"
+                            data-text="KhiangteVillain AI Images Generator"
                         >
                             KhiangteVillain AI Images Generator
                         </h1>
@@ -887,11 +911,33 @@ const App: React.FC = () => {
                                         <div className="p-6 border border-slate-700 rounded-xl space-y-6 bg-slate-800/50 animate-fade-in"><h3 className='text-xl font-semibold text-white'>Customize Headshot</h3><div><label className="block text-sm font-medium text-slate-400 mb-3">Facial Expression</label><div className="flex flex-wrap gap-3"><RadioPill name="expression" value="Friendly Smile" label="Friendly Smile" checked={headshotExpression === 'Friendly Smile'} onChange={e => setHeadshotExpression(e.target.value)} /><RadioPill name="expression" value="Confident Look" label="Confident Look" checked={headshotExpression === 'Confident Look'} onChange={e => setHeadshotExpression(e.target.value)} /><RadioPill name="expression" value="Thoughtful Gaze" label="Thoughtful Gaze" checked={headshotExpression === 'Thoughtful Gaze'} onChange={e => setHeadshotExpression(e.target.value)} /></div></div><div><label className="block text-sm font-medium text-slate-400 mb-3">Pose</label><div className="flex flex-wrap gap-3"><RadioPill name="pose" value="Forward" label="Facing Forward" checked={headshotPose === 'Forward'} onChange={e => setHeadshotPose(e.target.value)} /><RadioPill name="pose" value="Angle" label="Slight Angle" checked={headshotPose === 'Angle'} onChange={e => setHeadshotPose(e.target.value)} /></div></div></div>
                                      )}
                                      {template === 'styleLookbook' && (
-                                        <div className="p-6 border border-slate-700 rounded-xl space-y-6 bg-slate-800/50 animate-fade-in"><h3 className='text-xl font-semibold text-white'>Choose a Fashion Style</h3><div><div className="flex flex-wrap gap-3">{templates.styleLookbook.styles.map(style => <RadioPill key={style} name="style" value={style} label={style} checked={lookbookStyle === style} onChange={e => {setLookbookStyle(e.target.value); setCustomLookbookStyle('');}} />)}<RadioPill name="style" value="Other" label="Other..." checked={lookbookStyle === 'Other'} onChange={e => setLookbookStyle(e.target.value)} /></div></div>{lookbookStyle === 'Other' && <div><label className="block text-sm font-medium text-slate-400 mb-2">Your Custom Style</label><input type="text" placeholder="e.g., Cyberpunk, Avant-garde" value={customLookbookStyle} onChange={(e) => setCustomLookbookStyle(e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 text-white" /></div>}</div>
+                                        <div className="p-6 border border-slate-700 rounded-xl space-y-6 bg-slate-800/50 animate-fade-in"><h3 className='text-xl font-semibold text-white'>Choose a Fashion Style</h3><div><div className="flex flex-wrap gap-3">{templates.styleLookbook!.styles!.map(style => <RadioPill key={style} name="style" value={style} label={style} checked={lookbookStyle === style} onChange={e => {setLookbookStyle(e.target.value); setCustomLookbookStyle('');}} />)}<RadioPill name="style" value="Other" label="Other..." checked={lookbookStyle === 'Other'} onChange={e => setLookbookStyle(e.target.value)} /></div></div>{lookbookStyle === 'Other' && <div><label className="block text-sm font-medium text-slate-400 mb-2">Your Custom Style</label><input type="text" placeholder="e.g., Cyberpunk, Avant-garde" value={customLookbookStyle} onChange={(e) => setCustomLookbookStyle(e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 text-white" /></div>}</div>
                                      )}
                                 </div>
                             </div>
-                            <div className="mt-12 text-center"><Button onClick={handleGenerateClick} disabled={!uploadedImage || !template || isLoading || isUploading || isSettingUp} primary className="text-lg px-12 py-4"><div className="flex items-center gap-3">{isLoading || isSettingUp ? <><div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>{isSettingUp ? "Setting the stage..." : `Generating... (${Math.round(progress)}%)`}</> : <><IconSparkles />Generate Photos</>}</div></Button></div>
+                            <div className="mt-12 text-center">
+                                <div className="mb-4 text-sm text-slate-400">
+                                    {generationCount > 0 ? (
+                                        <p>Generations remaining today: <span className="font-bold text-cyan-300">{generationCount} / 10</span></p>
+                                    ) : (
+                                        <p className="font-bold text-pink-400">You've used all your generations. Please check back tomorrow!</p>
+                                    )}
+                                </div>
+                                <Button 
+                                    onClick={handleGenerateClick} 
+                                    disabled={!uploadedImage || !template || isLoading || isUploading || isSettingUp || generationCount <= 0} 
+                                    primary 
+                                    className="text-lg px-12 py-4"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        {isLoading || isSettingUp ? 
+                                            <><div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>{isSettingUp ? "Setting the stage..." : `Generating... (${Math.round(progress)}%)`}</> : 
+                                        generationCount <= 0 ? 
+                                            <>Limit Reached</> : 
+                                            <><IconSparkles />Generate Photos</>}
+                                    </div>
+                                </Button>
+                            </div>
                         </div>
 
                         <div ref={resultsRef}>
@@ -902,9 +948,6 @@ const App: React.FC = () => {
                                     {isLoading && <div className="w-full max-w-4xl mx-auto mb-8 text-center"><div className="bg-slate-800 rounded-full h-3 overflow-hidden shadow-md"><div className="bg-gradient-to-r from-cyan-400 to-pink-500 h-3 rounded-full transition-all duration-500" style={{width: `${progress}%`}}></div></div><p className="text-slate-400 mt-4 text-sm">Please keep this window open while your photos are being generated.</p></div>}
                                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
                                         {generatedImages.map((img, index) => {
-                                            // FIX: Replaced unsafe property access on a potentially empty object with
-                                            // optional chaining and a nullish coalescing operator. This resolves the
-                                            // TypeScript error and provides a safe fallback value for `isPolaroid`.
                                             const isPolaroid = templates[template!]?.isPolaroid ?? false;
                                             const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration'].includes(template!);
                                             switch (img.status) {

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Khiangtevillain Nano-banana</title>
+    <title>khiangtevillain ai image generator beta</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Added Babel to transpile JSX/TSX in the browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -53,7 +53,7 @@
         position: relative;
         color: #67e8f9; /* cyan-300 */
         text-shadow: 0 0 5px #67e8f9, 0 0 10px #67e8f9, 0 0 20px #22d3ee;
-        animation: glitch-scan 5s infinite linear;
+        animation: glitch-scan 8s infinite linear;
       }
       .glitch-text::before,
       .glitch-text::after {
@@ -70,12 +70,12 @@
       .glitch-text::before {
         left: 2px;
         text-shadow: -2px 0 #ec4899; /* pink-500 */
-        animation: glitch-anim-1 2s infinite linear alternate-reverse;
+        animation: glitch-anim-1 12s infinite linear alternate-reverse;
       }
       .glitch-text::after {
         left: -2px;
         text-shadow: -2px 0 #22d3ee, 2px 2px #ec4899;
-        animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        animation: glitch-anim-2 15s infinite linear alternate-reverse;
       }
 
       @keyframes glitch-anim-1 {
@@ -130,7 +130,7 @@
         20%, 40%, 60%, 80% { clip-path: inset(2% 0 1% 0); }
       }
     </style>
-<script type="importmap">
+  <script type="importmap">
 {
   "imports": {
     "react/": "https://aistudiocdn.com/react@^19.1.1/"
