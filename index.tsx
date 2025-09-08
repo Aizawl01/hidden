@@ -189,7 +189,7 @@ const getModelInstruction = (template: string, prompt: { id: string; base: strin
         }
         case 'keychainCreator': {
             const textLabel = keychainText && keychainText.trim() !== '' ? keychainText.trim() : "KhiangteVillain";
-            return `${baseInstruction} Create a 9:16 ultra-realistic product photograph with soft studio lighting and glossy highlights. The photo should feature a realistic action figure keychain of the person from the uploaded image, designed with lifelike details and natural proportions. The figure must have a soft, cheerful expression, a realistic face sculpt, and a premium collectible look. The keychain strap should be a bright color that complements the character's clothing and feature extra bold white text that reads "${textLabel}". A realistic human hand should be holding the keychain ring, with fingers gently pinching it, captured sharply in focus. The background must be softly blurred with mall interior lighting, cinematic bokeh, and a professional product showcase aesthetic.`;
+            return `${baseInstruction} Create a 9:16 ultra-realistic product photograph with soft studio lighting and glossy highlights. The photo should feature a realistic action figure keychain of the person from the uploaded image, designed with lifelike details and natural proportions. The figure must have a soft, cheerful expression, a realistic face sculpt, and a premium collectible look. The keychain strap should be a bright color that complements the character's clothing and feature extra bold white text that reads "${textLabel}". A realistic human hand should be holding the keychain ring, with fingers gently pinching it, captured sharply in focus. The background must be softly blurred with inside shop of the key chain interior lighting, cinematic bokeh, and a professional product showcase aesthetic.`;
         }
         default:
             return `Create an image based on the reference photo and this prompt: ${prompt.base}`;
@@ -910,7 +910,7 @@ const App: React.FC = () => {
                         >
                             KhiangteVillain AI Images Generator
                         </h1>
-                        <p className="mt-4 text-lg text-cyan-300/80">Transform your photos with (SOTA) AI model</p>
+                        <p className="mt-4 text-lg text-cyan-300/80">Transform your photos with (SOTA) AI model beta</p>
                         <div className="flex justify-center gap-x-8 gap-y-4 mt-6 flex-wrap">
                             <a href="https://www.instagram.com/khiangte.villain" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-300 hover:text-pink-400 transition-colors font-medium">
                                 <IconInstagram />
@@ -1038,7 +1038,7 @@ const App: React.FC = () => {
                     </main>
                     <footer className="text-center mt-16 py-8 border-t border-slate-800 text-slate-500 text-sm animate-fade-in">
                         <p>copyright khiangtevillain 2025</p>
-                        <p className="mt-1">site is sponsored by J&R business Aizawl, Mizoram</p>
+                        <p className="mt-1">Workspace by J&R business Aizawl, Mizoram</p>
                     </footer>
                 </div>
             </div>
