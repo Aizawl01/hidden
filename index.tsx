@@ -1,10 +1,14 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'https://esm.sh/react@19.1.1';
-import ReactDOM from 'https://esm.sh/react-dom@19.1.1/client';
-// Fix: Use standard import for @google/genai as per coding guidelines.
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// Fix: API key must be retrieved from environment variables as per coding guidelines.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// IMPORTANT: Your API key is now included in this file.
+// Be aware of the security risks of exposing an API key in client-side code.
+// For production, it's highly recommended to move API calls to a secure backend.
+const GEMINI_API_KEY = "AIzaSyC4hkmqihimopHTQBZ8sZa-zbq6ZtRnnms";
+
+const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
 
 declare const JSZip: any;
 
@@ -290,7 +294,7 @@ const ErrorNotification: React.FC<{ message: string | null, onDismiss: () => voi
     return (
         <div className="fixed top-5 left-1/2 z-50 w-full max-w-md p-4 bg-slate-900 border border-pink-500/50 text-gray-300 rounded-lg shadow-2xl flex items-center justify-between animate-fade-in-down" style={{ transform: 'translateX(-50%)' }}>
             <span>{message}</span>
-            <button onClick={onDismiss} className="p-1 rounded-full hover:bg-slate-800 transition-colors ml-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            <button onClick={onDismiss} className="p-1 rounded-full hover:bg-slate-800 transition-colors ml-4"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
         </div>
     );
 };
