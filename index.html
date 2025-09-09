@@ -144,6 +144,14 @@
   <body class="bg-slate-950">
     <canvas id="background-canvas"></canvas>
     <div id="root"></div>
+    <script>
+      // This shim is required to prevent a crash in browser environments where 'process' is not defined.
+      // The Gemini API client expects to find the API key in process.env.API_KEY.
+      // We provide the key here to allow the application to function.
+      if (typeof process === 'undefined') {
+        window.process = { env: { API_KEY: "AIzaSyC4hkmqihimopHTQBZ8sZa-zbq6ZtRnnms" } };
+      }
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script type="text/babel" data-presets="typescript,react" data-type="module" src="./index.tsx"></script>
   <script type="module" src="/index.tsx"></script>
