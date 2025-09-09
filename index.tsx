@@ -1,13 +1,13 @@
+
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// IMPORTANT: Your API key is now included in this file.
-// Be aware of the security risks of exposing an API key in client-side code.
-// For production, it's highly recommended to move API calls to a secure backend.
-const GEMINI_API_KEY = "AIzaSyC4hkmqihimopHTQBZ8sZa-zbq6ZtRnnms";
+// Fix: Initialize GoogleGenAI with API key from environment variable for security and correctness.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
-const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+// The secret code to unlock the app. Share this with your followers.
+const ACCESS_CODE = "NANO-VILLAIN-2025";
 
 
 declare const JSZip: any;
@@ -197,26 +197,41 @@ const getModelInstruction = (template: string, prompt: { id: string; base: strin
 };
 
 // --- Icons ---
+const IconCameraOutline = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-16 h-16 text-cyan-400/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>;
+const IconStar = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 19.448l-7.416 4.065L6.064 15.134 0 9.306l8.332-1.151z"/></svg>;
+const IconPixar = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-2.5-3.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm5 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM12 6c-1.93 0-3.5 1.57-3.5 3.5 0 .9.36 1.72.95 2.32.1.1.15.24.15.38v.05c0 .83.67 1.5 1.5 1.5h1.8c.83 0 1.5-.67 1.5-1.5v-.05c0-.14.05-.28.15-.38.59-.6 1-1.42 1-2.32C15.5 7.57 13.93 6 12 6z"/></svg>;
+const IconFlower = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-.5 0-1 .2-1.4.6L4.2 9c-1.6 1.6-1.6 4.1 0 5.7l6.4 6.4c.8.8 2 .8 2.8 0l6.4-6.4c1.6-1.6 1.6-4.1 0-5.7L13.4 2.6C13 2.2 12.5 2 12 2zm0 2c.3 0 .5.1.7.3l6.4 6.4c.8.8.8 2 0 2.8L12.7 20c-.4.4-1 .4-1.4 0L4.9 13.5c-.8-.8-.8-2 0-2.8l6.4-6.4c.2-.2.4-.3.7-.3zM12 7c-2.8 0-5 2.2-5 5s2.2 5 5 5 5-2.2 5-5-2.2-5-5-5zm0 2c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3z"/></svg>;
+const IconKeychain = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12.5 2C9.46 2 7 4.46 7 7.5c0 2.31 1.34 4.31 3.28 5.28L3 20h2.1l1.72-2.58C7.75 19.06 9.75 20 12 20c3.31 0 6-2.69 6-6s-2.69-6-6-6h-.5zm0 2c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4zM5.41 22L12 15.41V22h2v-8.34l-7.78-7.78-1.41 1.41L12.59 15H5v-2h5.17l-1.59-1.59L10 10l4 4-4 4z"/></svg>;
+const IconHourglass = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-6h-.01L18 15.99 14 12l4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zM16 8.5V4h-8v4.5l-4 4 4 4z"/></svg>;
+const IconLookbook = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2v4c0 1.1-.9 2-2 2H9c-1.1 0-2-.9-2-2v-4zm2 0h6v4H9v-4z"/></svg>;
+const IconEnhance = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25l1.34 2.72 2.98.43-2.16 2.1.51 2.97L12 9.18l-2.67 1.29.51-2.97-2.16-2.1 2.98-.43L12 2.25zm-6 8.25l1.34 2.72 2.98.43-2.16 2.1.51 2.97L6 14.43l-2.67 1.29.51-2.97-2.16-2.1 2.98-.43L6 10.5zm12 0l1.34 2.72 2.98.43-2.16 2.1.51 2.97L18 14.43l-2.67 1.29.51-2.97-2.16-2.1 2.98-.43L18 10.5z"/></svg>;
+const IconFigurine = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2a2 2 0 0 1 2-2m-2 5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>;
+const Icon80s = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM8 15A3 3 0 118 9a3 3 0 010 6zm8-3a1 1 0 110-2 1 1 0 010 2z"/></svg>;
+const IconHair = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.9 0 3.6.8 4.9 2.1l-1.4 1.4c-.9-.9-2.2-1.5-3.5-1.5s-2.6.6-3.5 1.5L7.1 4.1C8.4 2.8 10.1 2 12 2zm8.9 7.1c-1.7-1.7-4-2.1-6.2-1.1l-3.4-3.4c-2.2-1-4.5-.6-6.2 1.1l3.4 3.4c-2.2 1-2.6 3.3-1.1 5.1.7.8 1.6 1.3 2.6 1.5l4.3-4.3c1.9 0 3.6-.8 4.9-2.1l1.4 1.4C19.2 13.4 21 12.7 22 11c0-1.9-.8-3.6-2.1-4.9zM2 12c0-1.5.8-2.8 2.1-3.5L2.7 7.1C1 8.4 0 10.1 0 12s1 3.6 2.7 4.9l1.4-1.4C3.2 14.8 2 13.5 2 12zm17.9 2.9c1.6-1.7 1.2-4.1-1.1-5.1l-3.4 3.4c1.6 1.7 1.2 4.1-1.1 5.1l-4.3 4.3c1.9 0 3.6-.8 4.9-2.1l1.4 1.4C19.2 20.6 21 19.9 22 18c0-1.9-.8-3.6-2.1-4.9z"/></svg>;
+const IconImpossible = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M15 11.26V9.45c0-1.72-1.28-3.1-2.96-3.19C10.37 6.17 9 7.42 9 9v2.26C6.17 11.83 4 14.61 4 18h16c0-3.39-2.17-6.17-5-6.74zM12 20c-1.1 0-2-.9-2-2h4c0 1.1-.9 2-2 2zM13.2 5.09c.45-.37.79-.83.99-1.34l.2-1.3C14.48 1.7 13.82 1 13.06 1H11c-.75 0-1.41.69-1.2 1.45l.2 1.3c.2.51.55.97 1 1.34C9.17 6.17 8 8.42 8 11h8c0-2.58-1.17-4.83-3.2-5.91z"/></svg>;
+const IconHeadshot = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>;
 
-const IconUpload = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" /></svg>;
 const IconSparkles = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" /></svg>;
 const IconOptions = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" /></svg>;
 const IconDownload = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>;
-const IconCamera = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.776 48.776 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>;
+const IconCamera = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.776 48.776 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>;
 const IconPlus = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>;
 const IconX = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>;
 const IconInstagram = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664 4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.802C9.042 3.965 8.72 3.978 7.474 4.034c-2.43.111-3.64 1.317-3.75 3.75-.056 1.246-.068 1.568-.068 4.216s.012 2.97.068 4.216c.11 2.43 1.317 3.64 3.75 3.75 1.246.056 1.568.068 4.216.068s2.97-.012 4.216-.068c2.43-.11 3.64-1.317 3.75-3.75.056-1.246.068-1.568-.068-4.216s-.012-2.97-.068-4.216c-.11-2.43-1.317-3.64-3.75-3.75-1.246-.056-1.568-.068-4.216-.068zm0 5.438c-2.273 0-4.106 1.833-4.106 4.106s1.833 4.106 4.106 4.106 4.106-1.833 4.106-4.106-1.833-4.106-4.106-4.106zm0 6.55c-1.348 0-2.444-1.096-2.444-2.444s1.096-2.444 2.444-2.444 2.444 1.096 2.444 2.444-1.096 2.444-2.444 2.444zM16.949 6.05a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"></path></svg>;
 const IconYouTube = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path></svg>;
+const IconLock = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>;
+
 
 // --- React Components ---
 
-const Button: React.FC<{ children: React.ReactNode, onClick?: React.MouseEventHandler<HTMLButtonElement>, disabled?: boolean, primary?: boolean, className?: string }> = ({ children, onClick, disabled, primary = false, className = '' }) => {
+// Fix: Add 'type' prop to Button component to allow specifying button type (e.g., 'submit').
+const Button: React.FC<{ children: React.ReactNode, onClick?: React.MouseEventHandler<HTMLButtonElement>, disabled?: boolean, primary?: boolean, className?: string, type?: 'submit' | 'reset' | 'button' }> = ({ children, onClick, disabled, primary = false, className = '', type }) => {
     const baseClass = "px-6 py-2 rounded-md font-semibold tracking-wider uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
     const themeClass = primary 
         ? "bg-pink-600 text-white hover:bg-pink-500 shadow-lg shadow-pink-600/30 border border-pink-500" 
         : "bg-transparent border border-cyan-400/50 text-cyan-300 hover:bg-cyan-900/50 hover:text-white";
     
-    return <button onClick={onClick} disabled={disabled} className={`${baseClass} ${themeClass} ${className}`}>{children}</button>;
+    return <button type={type} onClick={onClick} disabled={disabled} className={`${baseClass} ${themeClass} ${className}`}>{children}</button>;
 };
 
 const PhotoDisplay: React.FC<{ era: string, imageUrl: string, onDownload: (url: string, era: string, ratio: string) => void, onRegenerate: () => void, isPolaroid?: boolean, index?: number, showLabel?: boolean }> = ({ era, imageUrl, onDownload, onRegenerate, isPolaroid = true, index=0, showLabel = true }) => {
@@ -384,13 +399,88 @@ const RadioPill: React.FC<{name: string, value: string, label: string, checked: 
     </label>
 );
 
-const TemplateCard: React.FC<{id: string, name: string, icon: string, description: string, isSelected: boolean, onSelect: (id: string) => void}> = ({ id, name, icon, description, isSelected, onSelect }) => (
-    <div onClick={() => onSelect(id)} className={`cursor-pointer p-5 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 shadow-lg ${isSelected ? 'border-pink-500 bg-pink-900/40 ring-2 ring-pink-500 shadow-lg shadow-pink-500/40' : 'border-slate-700 bg-slate-900 hover:border-cyan-400'}`}>
-        <div className="text-3xl mb-3">{icon}</div>
-        <h3 className="text-lg font-semibold text-white">{name}</h3>
-        <p className="text-sm text-gray-400 mt-1">{description}</p>
+const CircuitGraphic: React.FC<{children?: React.ReactNode}> = ({ children }) => (
+    <div className="relative w-full mt-2 text-center" aria-hidden="true">
+        <svg width="100%" height="40" viewBox="0 0 300 40" preserveAspectRatio="none" className="absolute top-1/2 left-0 -translate-y-1/2 w-full text-cyan-400/20">
+            <defs>
+                <filter id="glow-filter-circuit">
+                    <feGaussianBlur stdDeviation="1" result="coloredBlur" />
+                    <feMerge>
+                        <feMergeNode in="coloredBlur" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+            </defs>
+            <g filter="url(#glow-filter-circuit)">
+                <line x1="10" y1="20" x2="290" y2="20" stroke="currentColor" strokeWidth="1" />
+                <circle cx="10" cy="20" r="2.5" fill="currentColor" />
+                <circle cx="290" cy="20" r="2.5" fill="currentColor" />
+                <circle cx="150" cy="20" r="3.5" fill="currentColor" className="text-cyan-400/60" />
+                <circle cx="80" cy="20" r="2" fill="currentColor" />
+                <circle cx="220" cy="20" r="2" fill="currentColor" />
+                <line x1="50" y1="20" x2="50" y2="5" stroke="currentColor" strokeWidth="1" />
+                <line x1="50" y1="5" x2="30" y2="5" stroke="currentColor" strokeWidth="1" />
+                <circle cx="30" cy="5" r="1.5" fill="currentColor" />
+                <line x1="150" y1="20" x2="150" y2="35" stroke="currentColor" strokeWidth="1" />
+                <circle cx="150" cy="35" r="2" fill="currentColor" />
+                <line x1="250" y1="20" x2="250" y2="5" stroke="currentColor" strokeWidth="1" />
+                <line x1="250" y1="5" x2="270" y2="5" stroke="currentColor" strokeWidth="1" />
+                <circle cx="270" cy="5" r="1.5" fill="currentColor" />
+            </g>
+        </svg>
+        <div className="relative inline-block bg-slate-900 px-4">
+             {children}
+        </div>
     </div>
 );
+
+
+const TemplateCard: React.FC<{id: string, name: string, icon: React.ReactNode, description: string, isSelected: boolean, onSelect: (id: string) => void, iconColor: string}> = ({ id, name, icon, description, isSelected, onSelect, iconColor }) => (
+    <div 
+        onClick={() => onSelect(id)} 
+        className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-300 transform hover:scale-105 group ${isSelected ? 'bg-blue-900/40 border-blue-400 ring-2 ring-blue-400/50 shadow-lg shadow-blue-400/20' : 'bg-slate-950/70 border-slate-700 hover:border-blue-500'}`}
+    >
+        <div className={`mb-2 text-2xl transition-colors duration-300 ${isSelected ? iconColor : 'text-slate-400 group-hover:text-white'}`}>{icon}</div>
+        <h3 className="text-base font-semibold text-white leading-tight">{name}</h3>
+        <p className="text-xs text-gray-400 mt-1">{description}</p>
+    </div>
+);
+
+const AccessModal: React.FC<{ value: string, onChange: (e: React.ChangeEvent<HTMLInputElement>) => void, onSubmit: () => void, error: string | null }> = ({ value, onChange, onSubmit, error }) => {
+    return (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-lg z-50 flex items-center justify-center p-4 animate-fade-in">
+            <div className="w-full max-w-md bg-slate-900/70 border border-cyan-500/30 rounded-2xl shadow-2xl shadow-cyan-500/10 p-8 text-center">
+                <h2 className="font-orbitron text-2xl text-white uppercase mb-2">Follower Access Required</h2>
+                <p className="text-slate-400 mb-6">Please enter the access code to use the generator.</p>
+
+                <div className="mb-4 text-center">
+                    <p className="text-cyan-300">Find the latest code on Instagram!</p>
+                     <a href="https://www.instagram.com/khiangte.villain" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-slate-300 hover:text-pink-400 transition-colors font-medium mt-2 bg-slate-800/50 px-4 py-2 rounded-lg border border-slate-700">
+                        <IconInstagram />
+                        <span>@khiangte.villain</span>
+                    </a>
+                </div>
+
+                <form onSubmit={(e) => { e.preventDefault(); onSubmit(); }}>
+                    <input 
+                        type="text"
+                        placeholder="Enter code here..."
+                        value={value}
+                        onChange={onChange}
+                        className={`w-full text-center bg-slate-800 border ${error ? 'border-pink-500' : 'border-slate-600'} rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-white tracking-widest uppercase mb-4`}
+                    />
+                    {error && <p className="text-pink-400 text-sm mb-4 animate-fade-in">{error}</p>}
+                    <Button primary type="submit" className="w-full py-3 text-base">
+                        <div className="flex items-center justify-center gap-2">
+                            <IconLock />
+                            <span>Unlock</span>
+                        </div>
+                    </Button>
+                </form>
+            </div>
+        </div>
+    );
+};
 
 
 // Fix: Defined types for the templates object to resolve errors where properties
@@ -399,7 +489,8 @@ type TemplatePrompt = { id: string; base: string; };
 type TemplateData = {
     name: string;
     description: string;
-    icon: string;
+    icon: React.ReactNode;
+    iconColor: string;
     isPolaroid: boolean;
     prompts: TemplatePrompt[];
     styles?: string[];
@@ -430,6 +521,19 @@ const App: React.FC = () => {
     const [celebrityName, setCelebrityName] = useState('');
     const [keychainText, setKeychainText] = useState('');
     const [generationCount, setGenerationCount] = useState(3);
+
+    const [isUnlocked, setIsUnlocked] = useState(false);
+    const [accessCodeInput, setAccessCodeInput] = useState('');
+    const [unlockError, setUnlockError] = useState<string | null>(null);
+
+    const handleUnlockAttempt = () => {
+        if (accessCodeInput.trim().toUpperCase() === ACCESS_CODE.toUpperCase()) {
+            setIsUnlocked(true);
+            setUnlockError(null);
+        } else {
+            setUnlockError('Incorrect code. Please check Instagram for the latest one.');
+        }
+    };
 
     useEffect(() => {
         const storedCount = localStorage.getItem('generationCount');
@@ -605,78 +709,148 @@ const App: React.FC = () => {
         photoRestoration: {
             name: 'Photo Restoration',
             description: 'Repair and enhance old photographs.',
-            icon: '✨',
+            icon: <IconEnhance />,
+            iconColor: 'text-cyan-400',
             isPolaroid: false,
             prompts: [
                 { id: 'Colorize', base: 'Colorize this black and white photo with realistic, natural colors.' },
                 { id: 'Repair Damage', base: 'Repair physical damage like cracks, scratches, dust, and tears from this photo.' },
                 { id: 'Enhance Clarity', base: 'Improve the overall sharpness, clarity, and focus of this slightly blurry photo.' },
-                { id: 'Full Restore', base: 'Perform a full restoration: repair damage, colorize if B&W, and enhance clarity.' },
-                { id: 'Gentle Update', base: 'Gently enhance the colors and lighting to make the photo look more vibrant, without changing the vintage feel.' },
-                { id: 'Fix Fading', base: 'Restore faded colors and contrast to their original vibrancy.' }
             ]
         },
         pixarStyle: {
             name: 'Pixar-style Me',
             description: 'Become a 3D animated character.',
-            icon: '🧸',
+            icon: <IconPixar />,
+            iconColor: 'text-blue-400',
             isPolaroid: false,
             prompts: [
                 { id: 'Adventurer', base: 'as a brave adventurer in a lush, magical jungle.' },
                 { id: 'Scientist', base: 'as a quirky scientist in a chaotic, colorful laboratory.' },
                 { id: 'Musician', base: 'as a passionate musician on a brightly lit stage.' },
-                { id: 'Chef', base: 'as a cheerful chef in a warm, bustling kitchen.' },
-                { id: 'Artist', base: 'as a creative artist in a messy, paint-splattered studio.' },
-                { id: 'Astronaut', base: 'as a curious astronaut floating in a star-filled galaxy.' }
             ]
         },
         celebrity: {
-            name: "Stand with a Celebrity",
-            description: "Pose with your favorite star, in new scenes or in your original photo.",
-            icon: '⭐',
+            name: 'Stand with a Celebrity',
+            description: 'Pose with your favorite star, in new scenes or in your original photo.',
+            icon: <IconStar />,
+            iconColor: 'text-yellow-400',
             isPolaroid: false,
             prompts: [
-                { id: 'Side-by-Side', base: 'Add {celebrity} standing next to the person in the original photo. Both should be looking at the camera and smiling. Match the lighting, shadows, and style of the original image perfectly. Do not change the background or the original person.' },
-                { id: 'Photobomb', base: 'Add {celebrity} into the background of the original photo, photobombing the picture. Match the lighting, shadows, and style of the original image perfectly. Do not change the background or the original person.' },
-                { id: 'Red Carpet', base: 'posing on the red carpet with {celebrity} at a glamorous movie premiere.' },
-                { id: 'Casual Selfie', base: 'taking a fun, casual selfie with {celebrity}.' },
-                { id: 'Backstage Pass', base: 'getting a photo backstage with {celebrity} after a concert.' },
-                { id: 'On Set', base: 'visiting {celebrity} on a movie set and getting a picture together between takes.' },
+                { id: 'Red Carpet', base: 'posing together on a glamorous red carpet at a movie premiere. {celebrity} is standing next to the person.' },
+                { id: 'Coffee Shop', base: 'casually chatting and laughing with {celebrity} at a cozy, stylish coffee shop.' },
+                { id: 'Side-by-Side', base: 'Add {celebrity} into the photo, standing realistically right next to the person, smiling for the camera.' },
+                { id: 'Photobomb', base: '{celebrity} is photobombing the person from the original photo in a funny, playful way.' },
             ]
         },
-        mizoAttire: { name: 'Mizo Traditional Attire', description: 'Elegant portraits in traditional Mizo garments.', icon: '🌺', isPolaroid: false, prompts: [
-            { id: 'Puanchei', base: 'a Puanchei, the most colourful Mizo puan, worn in the traditional style by a woman' },
-            { id: 'Tawlhlohpuan', base: 'a Tawlhlohpuan, a puan of courage, draped valiantly over the shoulder of a man' },
-            { id: 'Ngotekherh', base: 'a Ngotekherh puan with its distinctive black and white stripes, paired with a simple blouse for a woman' },
-            { id: 'Kawrchei', base: 'a festive Kawrchei blouse with intricate embroidery, paired with a matching puan for a woman' },
-            { id: 'Festival Attire', base: 'vibrant attire suitable for the Chapchar Kut festival, including traditional accessories and a headdress' },
-            { id: 'Puan Laisen', base: 'an elegant Puan Laisen, a puan with prominent red stripes, worn gracefully' }
-        ]},
-        figurines: { name: 'Toys Miniature Me', description: 'Your own collectible figurines.', icon: '🧍‍♂️', isPolaroid: false, prompts: [
-            { id: 'Commercial Figurine', base: 'Create a 1/7 scale commercialized figurine of the characters in the picture, in a realistic style, in a real environment. The figurine is placed on a computer desk. The figurine has a round transparent acrylic base, with no text on the base. The content on the computer screen is a 3D modeling process of this figurine. Next to the computer screen is a toy packaging box, designed in a style reminiscent of high-quality collectible figures, printed with original artwork. The packaging features two-dimensional flat illustrations.' },
-            { id: 'Bobblehead', base: 'A realistic bobblehead figure of the person with an oversized head, displayed on a polished wooden desk next to a computer keyboard.' },
-            { id: 'Porcelain Figurine', base: 'A delicate souvenir porcelain figurine of the person, painted with glossy colors, sitting on a lace doily on a vintage dresser.' },
-            { id: 'Retro Action Figure', base: 'A retro 1980s-style action figure of the person, complete with articulated joints and slightly worn paint, posed in a dynamic stance on a rocky diorama base.' },
-            { id: 'Vinyl Figure', base: 'A stylized collectible vinyl art toy of the person with minimalist features, standing on a shelf filled with other similar toys.' },
-            { id: 'Plushy Figure', base: 'A soft, cute plushy figure of the person with detailed fabric texture and stitching, sitting on a neatly made bed.' },
-            { id: 'Wooden Folk Art', base: 'A hand-carved wooden folk art figure of the person, painted with rustic, charming details, standing on a simple wooden block on a craft fair table.' },
-            { id: 'Crystal Figurine', base: 'A transparent, multifaceted crystal figurine of the person, refracting brilliant light on a dark, velvet surface.' },
-            { id: 'Claymation Figure', base: 'A stop-motion claymation-style figure of the person, with visible fingerprints and charming imperfections, standing in a miniature, handcrafted set.' },
-            { id: 'Bronze Bust', base: 'A classic, weathered bronze bust sculpture of the person on a marble pedestal, as if displayed in a grand library or museum.' },
-        ] },
+        mizoAttire: {
+            name: 'Mizo Traditional Attire',
+            description: 'Elegant portraits in traditional Mizo garments.',
+            icon: <IconFlower />,
+            iconColor: 'text-pink-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Puanchei', base: 'a Puanchei, the most colourful Mizo costume.' },
+                { id: 'Kawrchei', base: 'a Kawrchei, a beautiful blouse.' },
+                { id: 'Ngotekherh', base: 'a Ngotekherh, a traditional Mizo puan.' },
+            ]
+        },
+        figurines: {
+            name: 'Toys Miniature Me',
+            description: 'Your own collectible figurines.',
+            icon: <IconFigurine />,
+            iconColor: 'text-orange-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Vinyl Figure', base: 'A stylized collectible vinyl art toy of the person with minimalist features, standing on a shelf filled with other similar toys.' },
+                { id: 'Plushy Figure', base: 'A soft, cute plushy figure of the person with detailed fabric texture and stitching, sitting on a neatly made bed.' },
+                { id: 'Bobblehead', base: 'A realistic bobblehead figure of the person with an oversized head, displayed on a polished wooden desk next to a computer keyboard.' },
+            ]
+        },
         keychainCreator: {
             name: "Keychain Creator",
             description: "A realistic product photo of a keychain of you.",
-            icon: '🔑',
+            icon: <IconKeychain />,
+            iconColor: 'text-blue-400',
             isPolaroid: false,
             prompts: [ { id: 'Keychain', base: '' } ]
         },
-        decades: { name: 'Time Traveler', description: 'See yourself through the decades.', icon: '⏳', isPolaroid: true, prompts: [{ id: '1950s', base: 'A 1950s style portrait.' }, { id: '1960s', base: 'A 1960s style portrait.' }, { id: '1970s', base: 'A 1970s style portrait.' }, { id: '1980s', base: 'An 1980s style portrait.' }, { id: '1990s', base: 'A 1990s style portrait.' }, { id: '2000s', base: 'A 2000s style portrait.' }] },
-        styleLookbook: { name: "Style Lookbook", description: "Your personal fashion photoshoot.", icon: '👗', isPolaroid: false, styles: ['Classic / Casual', 'Streetwear', 'Vintage', 'Goth', 'Preppy', 'Minimalist', 'Athleisure', 'Old Money / Quiet Luxury', 'Bohemian (Boho)', 'Business Casual', '90s Grunge', 'Cocktail / Formal'], prompts: [{ id: 'Look 1', base: 'a full-body shot, standing' }, { id: 'Look 2', base: 'a half-body shot, smiling' }, { id: 'Look 3', base: 'a candid walking shot' }, { id: 'Look 4', base: 'a shot showing off outfit details' }, { id: 'Look 5', base: 'a seated pose' }, { id: 'Look 6', base: 'a close-up shot focusing on accessories' }] },
-        eightiesMall: { name: "'80s Mall Shoot", description: "Totally tubular 1980s portraits.", icon: '📼', isPolaroid: false, prompts: [{ id: 'Smiling', base: 'a friendly, smiling pose' }, { id: 'Thoughtful', base: 'a thoughtful, looking away from the camera pose' }, { id: 'Fun', base: 'a fun, laughing pose' }, { id: 'Serious', base: 'a serious, dramatic pose' }, { id: 'Hand on Chin', base: 'posing with their hand on their chin' }, { id: 'Over the Shoulder', base: 'looking back over their shoulder' }] },
-        hairStyler: { name: 'Hair Styler', description: 'Try on new hairstyles and colors.', icon: '💇‍♀️', isPolaroid: false, prompts: [{ id: 'Short', base: 'a short hairstyle' }, { id: 'Medium', base: 'a medium-length hairstyle' }, { id: 'Long', base: 'a long hairstyle' }, { id: 'Straight', base: 'straight hair' }, { id: 'Wavy', base: 'wavy hair' }, { id: 'Curly', base: 'curly hair' }] },
-        impossibleSelfies: { name: 'Impossible Pics', description: 'Photos that defy reality.', icon: '🚀', isPolaroid: false, prompts: [{ id: 'With Lincoln', base: 'The person posing with Abraham Lincoln, who is also making a peace sign and sticking his tongue out. Keep the original location.' }, { id: 'Alien & Bubbles', base: 'The person posing next to a realistic alien holding two bubble guns, blowing thousands of bubbles. Keep the person\'s pose and the original location.' }, { id: 'Room of Puppies', base: 'The person posing in a room filled with a hundred different puppies.' }, { id: 'Singing Puppets', base: 'The person posing in a room full of large, whimsical, brightly colored felt puppets that are singing.' }, { id: 'Giant Chicken Tender', base: 'The person posing with their arm around a 4-foot-tall chicken tender. Keep the person\'s facial expression exactly the same.' }, { id: 'Yeti Photobomb', base: 'Add a realistic yeti standing next to the person on the left side of the photo, matching the lighting. Keep the person\'s pose and face exactly the same.' }] },
-        headshots: { name: "Pro Headshots", description: "Professional profile pictures.", icon: '💼', isPolaroid: false, prompts: [{ id: 'Business Suit', base: 'wearing a dark business suit with a crisp white shirt' }, { id: 'Smart Casual', base: 'wearing a smart-casual knit sweater over a collared shirt' }, { id: 'Creative Pro', base: 'wearing a dark turtleneck' }, { id: 'Corporate Look', base: 'wearing a light blue button-down shirt' }, { id: 'Bright & Modern', base: 'wearing a colorful blazer' }, { id: 'Relaxed', base: 'wearing a simple, high-quality t-shirt under a casual jacket' }] },
+        decades: {
+            name: 'Time Traveler',
+            description: 'See yourself through the decades.',
+            icon: <IconHourglass />,
+            iconColor: 'text-blue-400',
+            isPolaroid: true,
+            prompts: [
+                { id: '1970s', base: 'A 1970s style portrait.' },
+                { id: '1980s', base: 'An 1980s style portrait.' },
+                { id: '1990s', base: 'A 1990s style portrait.' }
+            ]
+        },
+        styleLookbook: {
+            name: "Style Lookbook",
+            description: "Your personal fashion photoshoot.",
+            icon: <IconLookbook />,
+            iconColor: 'text-blue-400',
+            isPolaroid: false,
+            styles: ['Streetwear', 'Vintage', 'Goth', 'Minimalist', 'Old Money', '90s Grunge'],
+            prompts: [
+                { id: 'Look 1', base: 'a full-body shot, standing' },
+                { id: 'Look 2', base: 'a half-body shot, smiling' },
+                { id: 'Look 3', base: 'a candid walking shot' }
+            ]
+        },
+        eightiesMall: {
+            name: "'80s Mall Shoot",
+            description: "Totally tubular 1980s portraits.",
+            icon: <Icon80s />,
+            iconColor: 'text-teal-400',
+            isPolaroid: true,
+            prompts: [
+                { id: 'Glamour Shot', base: 'a classic glamour shot pose with soft focus and dramatic lighting.' },
+                { id: 'Casual Pose', base: 'casually leaning against a neon sign with a cool, relaxed expression.' },
+                { id: 'Action Pose', base: 'a fun action pose, like jumping in the air or playing an air guitar.' },
+            ]
+        },
+        hairStyler: {
+            name: "Hair Styler",
+            description: "Try on new hairstyles and colors.",
+            icon: <IconHair />,
+            iconColor: 'text-purple-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Short', base: 'a chic short haircut' },
+                { id: 'Medium', base: 'a stylish medium-length haircut' },
+                { id: 'Long', base: 'beautiful long hair' },
+                { id: 'Bob', base: 'a classic bob haircut' },
+                { id: 'Pixie', base: 'a trendy pixie cut' },
+                { id: 'Curls', base: 'vibrant, bouncy curls' },
+            ]
+        },
+        impossibleSelfies: {
+            name: "Impossible Pics",
+            description: "Photos that defy reality.",
+            icon: <IconImpossible />,
+            iconColor: 'text-indigo-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Moon', base: 'taking a selfie on the surface of the moon with Earth in the background.' },
+                { id: 'Dinosaur', base: 'running away from a giant T-Rex in a prehistoric jungle.' },
+                { id: 'Underwater', base: 'exploring a vibrant coral reef surrounded by colorful fish in a sunken city.' },
+            ]
+        },
+        headshots: {
+            name: "Pro Headshots",
+            description: "Professional profile pictures.",
+            icon: <IconHeadshot />,
+            iconColor: 'text-gray-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Corporate', base: 'wearing professional business attire (like a suit jacket or blouse)' },
+                { id: 'Creative', base: 'wearing smart-casual attire (like a stylish sweater or button-down shirt)' },
+                { id: 'Tech', base: 'wearing a clean, modern outfit (like a simple t-shirt or polo shirt)' },
+            ]
+        },
     }), []);
 
     const regenerateImageAtIndex = useCallback(async (imageIndex: number) => {
@@ -897,153 +1071,117 @@ const App: React.FC = () => {
     
     return (
         <>
-            <CameraModal isOpen={isCameraOpen} onClose={() => setIsCameraOpen(false)} onCapture={handleCaptureConfirm} />
+           {!isUnlocked && 
+                <AccessModal 
+                    value={accessCodeInput}
+                    onChange={(e) => setAccessCodeInput(e.target.value)}
+                    onSubmit={handleUnlockAttempt}
+                    error={unlockError}
+                />
+            }
+            <div className={`transition-all duration-500 ${!isUnlocked ? 'filter blur-md pointer-events-none' : ''}`}>
+                <CameraModal isOpen={isCameraOpen} onClose={() => setIsCameraOpen(false)} onCapture={handleCaptureConfirm} />
 
-            <div className="bg-slate-950/0 text-gray-200 min-h-screen flex flex-col items-center p-4 pb-20 relative z-10">
-                 <ErrorNotification message={error} onDismiss={() => setError(null)} />
-                
-                <div className="w-full max-w-6xl mx-auto">
-                    <header className="text-center my-12 animate-fade-in-down">
-                        <h1 
-                            className="glitch-text text-4xl md:text-5xl font-orbitron tracking-tight uppercase"
-                            data-text="KhiangteVillain AI Images Generator"
-                        >
-                            KhiangteVillain
-                            {' '}
-                            <span style={{color: '#ec4899', textShadow: '0 0 5px #ec4899, 0 0 10px #ec4899, 0 0 20px #d946ef'}}>
-                                AI Images Generator
-                            </span>
-                        </h1>
-                        <p className="mt-4 text-lg text-cyan-300/80">Transform your photos with (SOTA) Nano-Banana Preview</p>
-                        <div className="flex justify-center gap-x-8 gap-y-4 mt-6 flex-wrap">
-                            <a href="https://www.instagram.com/khiangte.villain" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-300 hover:text-pink-400 transition-colors font-medium">
-                                <IconInstagram />
-                                <span>@khiangte.villain</span>
-                            </a>
-                            <a href="https://www.youtube.com/@khiangtevillainAi" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-300 hover:text-cyan-400 transition-colors font-medium">
-                                <IconYouTube />
-                                <span>@khiangtevillainAi</span>
-                            </a>
-                        </div>
-                    </header>
+                <div className="bg-slate-950/0 text-gray-200 min-h-screen flex flex-col items-center p-4 pb-20 relative z-10">
+                    <ErrorNotification message={error} onDismiss={() => setError(null)} />
+                    
+                    <div className="w-full max-w-5xl mx-auto">
+                        <header className="text-center mt-12 mb-16 animate-fade-in-down">
+                            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase flex flex-col items-center">
+                                <span className="glitch-text" data-text="KHIANGTEVILLAIN AI IMAGES">
+                                    KHIANGTEVILLAIN AI IMAGES
+                                </span>
+                                <span className="text-pink-500 text-5xl md:text-6xl mt-1" style={{ textShadow: '0 0 5px #ec4899, 0 0 15px #ec4899, 0 0 30px #ec4899' }}>
+                                    GENERATOR
+                                </span>
+                            </h1>
+                            <p className="mt-4 text-lg text-slate-400">Nano-Banana Preview</p>
+                            <div className="flex justify-center gap-x-8 gap-y-4 mt-6 flex-wrap">
+                                <a href="https://www.instagram.com/khiangte.villain" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-pink-400 transition-colors font-medium">
+                                    <IconInstagram />
+                                    <span>@khiangte.villain</span>
+                                </a>
+                                <a href="https://www.youtube.com/@khiangtevillainAi" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors font-medium">
+                                    <IconYouTube />
+                                    <span>@khiangtevillainAi</span>
+                                </a>
+                            </div>
+                        </header>
 
-                    <main>
-                        <div className="bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-slate-800 mb-16 animate-fade-in-up">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-
-                                <div>
-                                    <h2 className="text-2xl font-semibold mb-6 text-white font-orbitron">1. YOUR PHOTO</h2>
-                                    <div className="w-full aspect-square border-2 border-dashed border-slate-700 rounded-xl flex items-center justify-center cursor-pointer hover:border-pink-500 transition-colors bg-slate-800/50 overflow-hidden shadow-inner" onClick={() => !uploadedImage && fileInputRef.current?.click()}>
-                                        {isUploading ? <div className="flex flex-col items-center"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-pink-500"></div><p className="text-gray-400 mt-4">Uploading...</p></div> : uploadedImage ? <img src={uploadedImage} alt="Uploaded preview" className="w-full h-full object-contain" /> : <div className="flex flex-col items-center justify-center p-6 text-center text-slate-400"><IconUpload /><p className="mt-4 text-lg text-slate-300">Click to upload a file</p><p className="mt-4 text-sm">or</p><Button onClick={(e) => { e.stopPropagation(); setIsCameraOpen(true); }} className="mt-2"><div className="flex items-center gap-2"><IconCamera /><span>Use Camera</span></div></Button></div>}
+                        <main>
+                            <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8">
+                                <div className="bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-cyan-400/20 animate-fade-in-up" style={{boxShadow: '0 0 40px rgba(56, 189, 248, 0.1)'}}>
+                                    <h2 className="text-xl font-semibold mb-4 text-cyan-300 uppercase tracking-widest">1. YOUR PHOTO</h2>
+                                    <div 
+                                      className="w-full aspect-square bg-slate-950/50 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 overflow-hidden relative border-2 border-cyan-400/30 shadow-[0_0_15px_rgba(56,189,248,0.15)] hover:border-cyan-400/70 hover:shadow-[0_0_25px_rgba(56,189,248,0.3)]" 
+                                      onClick={() => !uploadedImage && fileInputRef.current?.click()}
+                                    >
+                                        {isUploading ? <div className="flex flex-col items-center"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-pink-500"></div><p className="text-gray-400 mt-4">Uploading...</p></div> : uploadedImage ? <img src={uploadedImage} alt="Uploaded preview" className="w-full h-full object-contain" /> : <div className="flex flex-col items-center justify-center p-6 text-center text-cyan-400/70"><IconCameraOutline /><p className="mt-4 text-lg text-cyan-300">Click or drag a file</p><button onClick={(e) => { e.stopPropagation(); setIsCameraOpen(true); }} className="mt-4 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-slate-800/60 hover:bg-slate-700/80 transition-colors"><IconCamera />USE CAMERA</button></div>}
                                     </div>
-                                    {uploadedImage && !isUploading && <div className="flex flex-col sm:flex-row gap-4 mt-4 w-full"><Button onClick={() => fileInputRef.current?.click()} className="flex-1">Change File</Button><Button onClick={() => setIsCameraOpen(true)} className="flex-1"><div className="flex items-center justify-center gap-2"><IconCamera /><span>Use Camera</span></div></Button></div>}
-                                     <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/png, image/jpeg" className="hidden" />
-                                </div>
+                                    {uploadedImage && !isUploading && <div className="flex flex-col sm:flex-row gap-4 mt-4"><Button onClick={() => fileInputRef.current?.click()} className="flex-1">Change File</Button><Button onClick={() => setIsCameraOpen(true)} className="flex-1"><div className="flex items-center justify-center gap-2"><IconCamera /><span>Use Camera</span></div></Button></div>}
+                                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/png, image/jpeg" className="hidden" />
 
-                                <div>
-                                     <h2 className="text-2xl font-semibold mb-6 text-white font-orbitron">2. CHOOSE THEME</h2>
-                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-                                        {Object.entries(templates).map(([key, data]) => <TemplateCard key={key} id={key} name={data.name} icon={data.icon} description={data.description} isSelected={template === key} onSelect={handleTemplateSelect} />)}
-                                     </div>
-                                     
-                                      {template === 'celebrity' && (
-                                        <div className="p-6 border border-slate-700 rounded-xl space-y-4 bg-slate-800/50 animate-fade-in">
-                                            <h3 className='text-xl font-semibold text-white'>Celebrity Details</h3>
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-400 mb-2">Celebrity's Full Name</label>
-                                                <input
-                                                    type="text"
-                                                    placeholder="e.g., Taylor Swift"
-                                                    value={celebrityName}
-                                                    onChange={(e) => setCelebrityName(e.target.value)}
-                                                    className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 text-white"
-                                                />
+                                    <div className="mt-6 text-center">
+                                         <CircuitGraphic>
+                                            <div className="text-sm text-cyan-300/80">
+                                                {generationCount > 0 ? (
+                                                    <p>Generations remaining today: <span className="font-bold text-cyan-300">{generationCount} / 3</span></p>
+                                                ) : (
+                                                    <p className="font-bold text-pink-400">No generations left today</p>
+                                                )}
                                             </div>
-                                        </div>
-                                     )}
-                                     {template === 'keychainCreator' && (
-                                        <div className="p-6 border border-slate-700 rounded-xl space-y-4 bg-slate-800/50 animate-fade-in">
-                                            <h3 className='text-xl font-semibold text-white'>Keychain Details</h3>
-                                            <div>
-                                                <label className="block text-sm font-medium text-slate-400 mb-2">Keychain Text Label (Optional)</label>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Defaults to 'KhiangteVillain'"
-                                                    value={keychainText}
-                                                    onChange={(e) => setKeychainText(e.target.value)}
-                                                    className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 text-white"
-                                                />
+                                         </CircuitGraphic>
+
+                                        <button 
+                                            onClick={handleGenerateClick} 
+                                            disabled={!uploadedImage || !template || isLoading || isUploading || isSettingUp || generationCount <= 0} 
+                                            className="mt-6 w-full text-base font-bold tracking-wider uppercase rounded-lg p-3 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden bg-pink-600 border border-pink-500 shadow-lg shadow-pink-500/30 hover:bg-pink-500"
+                                        >
+                                            <div className="relative flex items-center justify-center gap-2.5 text-white">
+                                                {isLoading || isSettingUp ? 
+                                                    <><div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>{isSettingUp ? "Setting up..." : `Generating...`}</> : 
+                                                generationCount <= 0 ? 
+                                                    <>Limit Reached</> : 
+                                                    <><IconSparkles /><span>GENERATE PHOTOS</span></>}
                                             </div>
-                                        </div>
-                                     )}
-                                     {template === 'hairStyler' && (
-                                        <div className="p-6 border border-slate-700 rounded-xl space-y-6 bg-slate-800/50 animate-fade-in">
-                                            <div className="flex justify-between items-center"><h3 className='text-xl font-semibold text-white'>Customize Hairstyle</h3><span className={`text-sm font-bold ${totalSelectedStyles >= 6 ? 'text-pink-400' : 'text-slate-500'}`}>{totalSelectedStyles} / 6</span></div>
-                                            <div><label className="block text-sm font-medium text-slate-400 mb-3">Style (select up to 6)</label><div className="flex flex-wrap gap-3">{templates.hairStyler.prompts.map(p => <button key={p.id} onClick={() => handleHairStyleSelect(p.id)} className={`cursor-pointer px-3 py-1.5 text-sm rounded-full transition-colors font-semibold ${selectedHairStyles.includes(p.id) ? 'bg-pink-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}>{p.id}</button>)}<button onClick={() => handleHairStyleSelect('Other')} className={`cursor-pointer px-3 py-1.5 text-sm rounded-full transition-colors font-semibold ${isCustomHairActive ? 'bg-pink-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}>Other...</button></div></div>
-                                            {isCustomHairActive && <div><label className="block text-sm font-medium text-slate-400 mb-2">Your Custom Style</label><input type="text" placeholder="e.g., A vibrant pink mohawk" value={customHairStyle} onChange={(e) => setCustomHairStyle(e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 text-white" /></div>}
-                                            <div><label className="block text-sm font-medium text-slate-400 mb-3">Hair Color</label><div className="flex items-center gap-4 flex-wrap">{hairColors.map((color, index) => <div key={index} className="flex items-center gap-2 p-2 bg-slate-700/50 rounded-lg border border-slate-600"><div className="relative w-10 h-10 rounded-md overflow-hidden" style={{ backgroundColor: color }}><input type="color" value={color} onChange={(e) => handleColorChange(index, e.target.value)} className="absolute inset-0 w-full h-full cursor-pointer opacity-0" /></div><span className="font-mono text-sm text-slate-300 uppercase">{color}</span><button onClick={() => removeHairColor(index)} className="p-1 rounded-full text-slate-500 hover:bg-slate-600 hover:text-red-400 transition-colors" aria-label="Remove color"><IconX /></button></div>)}
-                                            {hairColors.length < 2 && <button onClick={addHairColor} className="flex items-center justify-center gap-2 h-[68px] px-4 rounded-lg border-2 border-dashed border-slate-600 hover:border-pink-500 text-slate-400 hover:text-pink-400 transition-colors bg-slate-700/30"><IconPlus /><span>{hairColors.length === 0 ? 'Add Color' : 'Add Highlight'}</span></button>}</div>{hairColors.length > 0 && <button onClick={() => setHairColors([])} className="text-xs text-slate-500 hover:text-white transition-colors mt-3">Clear all colors</button>}</div>
-                                        </div>
-                                     )}
-                                     {template === 'headshots' && (
-                                        <div className="p-6 border border-slate-700 rounded-xl space-y-6 bg-slate-800/50 animate-fade-in"><h3 className='text-xl font-semibold text-white'>Customize Headshot</h3><div><label className="block text-sm font-medium text-slate-400 mb-3">Facial Expression</label><div className="flex flex-wrap gap-3"><RadioPill name="expression" value="Friendly Smile" label="Friendly Smile" checked={headshotExpression === 'Friendly Smile'} onChange={e => setHeadshotExpression(e.target.value)} /><RadioPill name="expression" value="Confident Look" label="Confident Look" checked={headshotExpression === 'Confident Look'} onChange={e => setHeadshotExpression(e.target.value)} /><RadioPill name="expression" value="Thoughtful Gaze" label="Thoughtful Gaze" checked={headshotExpression === 'Thoughtful Gaze'} onChange={e => setHeadshotExpression(e.target.value)} /></div></div><div><label className="block text-sm font-medium text-slate-400 mb-3">Pose</label><div className="flex flex-wrap gap-3"><RadioPill name="pose" value="Forward" label="Facing Forward" checked={headshotPose === 'Forward'} onChange={e => setHeadshotPose(e.target.value)} /><RadioPill name="pose" value="Angle" label="Slight Angle" checked={headshotPose === 'Angle'} onChange={e => setHeadshotPose(e.target.value)} /></div></div></div>
-                                     )}
-                                     {template === 'styleLookbook' && (
-                                        <div className="p-6 border border-slate-700 rounded-xl space-y-6 bg-slate-800/50 animate-fade-in"><h3 className='text-xl font-semibold text-white'>Choose a Fashion Style</h3><div><div className="flex flex-wrap gap-3">{templates.styleLookbook!.styles!.map(style => <RadioPill key={style} name="style" value={style} label={style} checked={lookbookStyle === style} onChange={e => {setLookbookStyle(e.target.value); setCustomLookbookStyle('');}} />)}<RadioPill name="style" value="Other" label="Other..." checked={lookbookStyle === 'Other'} onChange={e => setLookbookStyle(e.target.value)} /></div></div>{lookbookStyle === 'Other' && <div><label className="block text-sm font-medium text-slate-400 mb-2">Your Custom Style</label><input type="text" placeholder="e.g., Cyberpunk, Avant-garde" value={customLookbookStyle} onChange={(e) => setCustomLookbookStyle(e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-4 focus:outline-none focus:ring-2 focus:ring-pink-500 text-white" /></div>}</div>
-                                     )}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-cyan-400/20 animate-fade-in-up styled-scrollbar overflow-y-auto" style={{boxShadow: '0 0 40px rgba(56, 189, 248, 0.1)', maxHeight: '720px'}}>
+                                    <h2 className="text-xl font-semibold mb-4 text-cyan-300 uppercase tracking-widest">2. CHOOSE THEME</h2>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                        {Object.entries(templates).map(([key, data]) => <TemplateCard key={key} id={key} name={data.name} icon={data.icon} description={data.description} isSelected={template === key} onSelect={handleTemplateSelect} iconColor={data.iconColor} />)}
+                                    </div>
                                 </div>
                             </div>
-                            <div className="mt-12 text-center">
-                                <div className="mb-4 text-sm text-slate-400">
-                                    {generationCount > 0 ? (
-                                        <p>Generations remaining today: <span className="font-bold text-cyan-300">{generationCount} / 3</span></p>
-                                    ) : (
-                                        <p className="font-bold text-pink-400">You've used all your generations. Please check back tomorrow!</p>
-                                    )}
-                                </div>
-                                <Button 
-                                    onClick={handleGenerateClick} 
-                                    disabled={!uploadedImage || !template || isLoading || isUploading || isSettingUp || generationCount <= 0} 
-                                    primary 
-                                    className="text-lg px-12 py-4"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        {isLoading || isSettingUp ? 
-                                            <><div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>{isSettingUp ? "Setting the stage..." : `Generating... (${Math.round(progress)}%)`}</> : 
-                                        generationCount <= 0 ? 
-                                            <>Limit Reached</> : 
-                                            <><IconSparkles />Generate Photos</>}
-                                    </div>
-                                </Button>
-                            </div>
-                        </div>
 
-                        <div ref={resultsRef}>
-                            {isSettingUp && <div className="text-center my-20 flex flex-col items-center p-10 bg-slate-900/70 rounded-2xl"><div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-pink-500 mb-6"></div><p className="text-2xl text-pink-400 font-semibold tracking-wider italic">Teasing our hair and firing up the lasers...</p><p className="text-slate-400 mt-2">Generating a totally tubular '80s photoshoot style!</p></div>}
-                            {(isLoading || generatedImages.length > 0) && !isSettingUp && (
-                                <div className="mt-16">
-                                    <h2 className="text-3xl font-bold text-white mb-8 text-center font-orbitron">YOUR GENERATED PHOTOS</h2>
-                                    {isLoading && <div className="w-full max-w-4xl mx-auto mb-8 text-center"><div className="bg-slate-800 rounded-full h-3 overflow-hidden shadow-md"><div className="bg-gradient-to-r from-cyan-400 to-pink-500 h-3 rounded-full transition-all duration-500" style={{width: `${progress}%`}}></div></div><p className="text-slate-400 mt-4 text-sm">Please keep this window open while your photos are being generated.</p></div>}
-                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
-                                        {generatedImages.map((img, index) => {
-                                            const isPolaroid = templates[template!]?.isPolaroid ?? false;
-                                            const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration', 'celebrity', 'keychainCreator'].includes(template!);
-                                            switch (img.status) {
-                                                case 'success': return <PhotoDisplay key={`${img.id}-${index}-s`} era={img.id} imageUrl={img.imageUrl!} onDownload={handleDownloadRequest} onRegenerate={() => regenerateImageAtIndex(index)} isPolaroid={isPolaroid} index={index} showLabel={showLabel} />;
-                                                case 'failed': return <ErrorCard key={`${img.id}-${index}-f`} era={img.id} isPolaroid={isPolaroid} onRegenerate={() => regenerateImageAtIndex(index)} showLabel={showLabel} />;
-                                                default: return <LoadingCard key={`${img.id}-${index}-p`} era={img.id} isPolaroid={isPolaroid} showLabel={showLabel} />;
-                                            }
-                                        })}
+                            <div ref={resultsRef}>
+                                {isSettingUp && <div className="text-center my-20 flex flex-col items-center p-10 bg-slate-900/70 rounded-2xl"><div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-pink-500 mb-6"></div><p className="text-2xl text-pink-400 font-semibold tracking-wider italic">Teasing our hair and firing up the lasers...</p><p className="text-slate-400 mt-2">Generating a totally tubular '80s photoshoot style!</p></div>}
+                                {(isLoading || generatedImages.length > 0) && !isSettingUp && (
+                                    <div className="mt-16">
+                                        <h2 className="text-3xl font-bold text-white mb-8 text-center font-orbitron">YOUR GENERATED PHOTOS</h2>
+                                        {isLoading && <div className="w-full max-w-4xl mx-auto mb-8 text-center"><div className="bg-slate-800 rounded-full h-3 overflow-hidden shadow-md"><div className="bg-gradient-to-r from-cyan-400 to-pink-500 h-3 rounded-full transition-all duration-500" style={{width: `${progress}%`}}></div></div><p className="text-slate-400 mt-4 text-sm">Please keep this window open while your photos are being generated.</p></div>}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
+                                            {generatedImages.map((img, index) => {
+                                                const isPolaroid = templates[template!]?.isPolaroid ?? false;
+                                                const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration', 'celebrity', 'keychainCreator'].includes(template!);
+                                                switch (img.status) {
+                                                    case 'success': return <PhotoDisplay key={`${img.id}-${index}-s`} era={img.id} imageUrl={img.imageUrl!} onDownload={handleDownloadRequest} onRegenerate={() => regenerateImageAtIndex(index)} isPolaroid={isPolaroid} index={index} showLabel={showLabel} />;
+                                                    case 'failed': return <ErrorCard key={`${img.id}-${index}-f`} era={img.id} isPolaroid={isPolaroid} onRegenerate={() => regenerateImageAtIndex(index)} showLabel={showLabel} />;
+                                                    default: return <LoadingCard key={`${img.id}-${index}-p`} era={img.id} isPolaroid={isPolaroid} showLabel={showLabel} />;
+                                                }
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                            {!isLoading && generatedImages.length > 0 && <div className="text-center mt-16 mb-12 flex flex-col sm:flex-row justify-center items-center gap-6"><Button onClick={handleStartOver}>Start Over</Button><Button onClick={handleAlbumDownloadRequest} primary disabled={isDownloadingAlbum}>{isDownloadingAlbum ? <div className="flex items-center gap-2"><div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div><span>Zipping...</span></div> : <div className="flex items-center gap-2"><IconDownload /><span>Download Album</span></div>}</Button></div>}
-                        </div>
-                    </main>
-                    <footer className="text-center mt-16 py-8 border-t border-slate-800 text-slate-500 text-sm animate-fade-in">
-                        <p>copyright khiangtevillain 2025</p>
-                        <p className="mt-1">Workspace by J&R business Aizawl, Mizoram</p>
-                    </footer>
+                                )}
+                                {!isLoading && generatedImages.length > 0 && <div className="text-center mt-16 mb-12 flex flex-col sm:flex-row justify-center items-center gap-6"><Button onClick={handleStartOver}>Start Over</Button><Button onClick={handleAlbumDownloadRequest} primary disabled={isDownloadingAlbum}>{isDownloadingAlbum ? <div className="flex items-center gap-2"><div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div><span>Zipping...</span></div> : <div className="flex items-center gap-2"><IconDownload /><span>Download Album</span></div>}</Button></div>}
+                            </div>
+                        </main>
+                        <footer className="text-center mt-16 py-8 border-t border-slate-800 text-slate-500 text-sm animate-fade-in">
+                            <p>copyright khiangtevillain 2025</p>
+                            <p className="mt-1">Workspace by J&R business Aizawl, Mizoram</p>
+                        </footer>
+                    </div>
                 </div>
             </div>
         </>
