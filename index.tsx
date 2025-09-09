@@ -908,9 +908,13 @@ const App: React.FC = () => {
                             className="glitch-text text-4xl md:text-5xl font-orbitron tracking-tight uppercase"
                             data-text="KhiangteVillain AI Images Generator"
                         >
-                            KhiangteVillain AI Images Generator
+                            KhiangteVillain
+                            {' '}
+                            <span style={{color: '#ec4899', textShadow: '0 0 5px #ec4899, 0 0 10px #ec4899, 0 0 20px #d946ef'}}>
+                                AI Images Generator
+                            </span>
                         </h1>
-                        <p className="mt-4 text-lg text-cyan-300/80">Transform your photos with (SOTA) AI model beta</p>
+                        <p className="mt-4 text-lg text-cyan-300/80">Transform your photos with (SOTA) Nano-Banana Preview</p>
                         <div className="flex justify-center gap-x-8 gap-y-4 mt-6 flex-wrap">
                             <a href="https://www.instagram.com/khiangte.villain" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-300 hover:text-pink-400 transition-colors font-medium">
                                 <IconInstagram />
