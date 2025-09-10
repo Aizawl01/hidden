@@ -1,10 +1,13 @@
 
+
+
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// Initialize the Google AI client with the API key provided in the HTML.
-const ai = new GoogleGenAI({ apiKey: window['process']['env']['API_KEY'] });
+// Fix: Use process.env.API_KEY directly as per the coding guidelines.
+// Initialize the Google AI client with the API key from environment variables.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // The secret code to unlock the app. Share this with your followers.
 const ACCESS_CODE = "NANO-VILLAIN-2025";
@@ -246,6 +249,7 @@ const PhotoDisplay: React.FC<{ era: string, imageUrl: string, onDownload: (url: 
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
+            // Fix: Cast event.target to Node, as the 'contains' method expects a Node object.
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsMenuOpen(false);
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -591,6 +595,8 @@ const App: React.FC = () => {
 
     // Effect for optimizing background particle animation
     useEffect(() => {
+        // Fix: Cast the result of getElementById to HTMLCanvasElement to resolve type errors
+        // and allow access to canvas-specific properties like `width`, `height`, and methods like `getContext`.
         const canvas = document.getElementById('background-canvas') as HTMLCanvasElement;
         if (!canvas) return;
 
@@ -1162,7 +1168,7 @@ const App: React.FC = () => {
                 return;
             }
     
-            const zip = new window['JSZip']();
+            const zip = new (window as any)['JSZip']();
             
             for (let i = 0; i < successfulImages.length; i++) {
                 const img = successfulImages[i];
