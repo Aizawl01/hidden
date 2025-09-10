@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
+import { GoogleGenAI, Modality } from '@google/genai';
 
-// IMPORTANT: Replace this with your actual Google Cloud Function URL after deployment.
-const CLOUD_FUNCTION_URL = 'YOUR_CLOUD_FUNCTION_URL_HERE';
+// Fix: Initialize GoogleGenAI with API key from environment variable for security and correctness.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // The secret code to unlock the app. Share this with your followers.
 const ACCESS_CODE = "NANO-VILLAIN-2025";
@@ -232,6 +233,7 @@ const IconShare = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 
 // --- React Components ---
 
+// Fix: Add 'type' prop to Button component to allow specifying button type (e.g., 'submit').
 const Button: React.FC<{ children: React.ReactNode, onClick?: React.MouseEventHandler<HTMLButtonElement>, disabled?: boolean, primary?: boolean, className?: string, type?: 'submit' | 'reset' | 'button' }> = ({ children, onClick, disabled, primary = false, className = '', type }) => {
     const baseClass = "px-6 py-2 rounded-md font-semibold tracking-wider uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
     const themeClass = primary 
@@ -494,6 +496,8 @@ const AccessModal: React.FC<{ value: string, onChange: (e: React.ChangeEvent<HTM
 };
 
 
+// Fix: Defined types for the templates object to resolve errors where properties
+// on the `data` variable were not accessible due to being typed as 'unknown'.
 type TemplatePrompt = { id: string; base: string; };
 type TemplateData = {
     name: string;
@@ -640,20 +644,11 @@ const App: React.FC = () => {
     // --- API Helper Functions ---
     const generateDynamicPrompt = useCallback(async (themeDescription: string): Promise<string> => {
         try {
-            const response = await fetch(CLOUD_FUNCTION_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    task: 'generateText',
-                    payload: {
-                        prompt: `Generate a short, creative, and detailed style description for a photoshoot based on this theme: "${themeDescription}". The description should be a single sentence and sound cool.`
-                    }
-                }),
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: `Generate a short, creative, and detailed style description for a photoshoot based on this theme: "${themeDescription}". The description should be a single sentence and sound cool.`,
             });
-            if (!response.ok) throw new Error(`Server responded with ${response.status}`);
-            const data = await response.json();
-            if (data.error) throw new Error(data.error);
-            return data.text.trim();
+            return response.text.trim();
         } catch (error) {
             console.error("Error generating dynamic prompt:", error);
             return "A retro 80s studio background with laser beams, neon geometric shapes, fog, and dramatic backlighting.";
@@ -661,46 +656,34 @@ const App: React.FC = () => {
     }, []);
 
     const generateImageWithRetry = useCallback(async (modelInstruction: string, imageWithoutPrefix: string, totalAttempts = 3): Promise<string> => {
-        if (!CLOUD_FUNCTION_URL || CLOUD_FUNCTION_URL === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
-            throw new Error("Cloud Function URL is not configured in index.tsx.");
-        }
-        
         let lastError: Error | undefined;
         for (let attempt = 1; attempt <= totalAttempts; attempt++) {
             try {
-                const response = await fetch(CLOUD_FUNCTION_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        task: 'generateImage',
-                        payload: {
-                            instruction: modelInstruction,
-                            image: imageWithoutPrefix
-                        }
-                    }),
+                const imagePart = { inlineData: { data: imageWithoutPrefix, mimeType: 'image/png' } };
+                const textPart = { text: modelInstruction };
+
+                const response = await ai.models.generateContent({
+                    model: 'gemini-2.5-flash-image-preview',
+                    contents: { parts: [textPart, imagePart] },
+                    config: { responseModalities: [Modality.IMAGE, Modality.TEXT] },
                 });
 
-                if (!response.ok) {
-                    throw new Error(`Server responded with status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.error) {
-                    throw new Error(data.error);
+                if (response.candidates && response.candidates.length > 0) {
+                  for (const part of response.candidates[0].content.parts) {
+                    if (part.inlineData && part.inlineData.data) {
+                      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+                    }
+                  }
                 }
                 
-                if (data.imageUrl) {
-                    return data.imageUrl;
-                }
-
                 lastError = new Error("API returned no image data.");
+                console.warn(`Attempt ${attempt}/${totalAttempts}: ${lastError.message}`);
 
             } catch (error) {
                 lastError = error as Error;
                 console.error(`Attempt ${attempt}/${totalAttempts} failed:`, error);
-                if (error instanceof Error && error.message.includes('Cloud Function')) {
-                    setError("The backend function is not configured. Please follow the deployment steps.");
+                if (error instanceof Error && error.message.includes('API key not valid')) {
+                    setError("The API key is not valid. Please ensure it is configured correctly in the environment.");
                     throw error;
                 }
             }
@@ -718,4 +701,592 @@ const App: React.FC = () => {
     const addHairColor = () => { if (hairColors.length < 2) setHairColors(p => [...p, '#ff00ff']); };
     const removeHairColor = (index: number) => setHairColors(p => p.filter((_, i) => i !== index));
 
-    const handleHairStyleSelect = (style
+    const handleHairStyleSelect = (styleId: string) => {
+        if (styleId === 'Other') {
+            setIsCustomHairActive(prev => {
+                if (!prev && (selectedHairStyles.length + 1) > 6) { setError("You can select a maximum of 6 styles."); return prev; }
+                if (prev) setCustomHairStyle('');
+                return !prev;
+            });
+            return;
+        }
+        setSelectedHairStyles(prev => {
+            if (prev.includes(styleId)) return prev.filter(s => s !== styleId);
+            if (prev.length + (isCustomHairActive ? 1 : 0) < 6) return [...prev, styleId];
+            setError("You can select a maximum of 6 styles.");
+            return prev;
+        });
+    };
+
+    const templates: { [key: string]: TemplateData } = useMemo(() => ({
+        photoRestoration: {
+            name: 'Photo Restoration',
+            description: 'Repair and enhance old photographs.',
+            icon: <IconEnhance />,
+            iconColor: 'text-cyan-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Colorize', base: 'Colorize this black and white photo with realistic, natural colors.' },
+                { id: 'Repair Damage', base: 'Repair physical damage like cracks, scratches, dust, and tears from this photo.' },
+                { id: 'Enhance Clarity', base: 'Improve the overall sharpness, clarity, and focus of this slightly blurry photo.' },
+            ]
+        },
+        pixarStyle: {
+            name: 'Pixar-style Me',
+            description: 'Become a 3D animated character.',
+            icon: <IconPixar />,
+            iconColor: 'text-blue-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Adventurer', base: 'as a brave adventurer in a lush, magical jungle.' },
+                { id: 'Scientist', base: 'as a quirky scientist in a chaotic, colorful laboratory.' },
+                { id: 'Musician', base: 'as a passionate musician on a brightly lit stage.' },
+            ]
+        },
+        celebrity: {
+            name: 'Stand with a Celebrity',
+            description: 'Pose with your favorite star, in new scenes or in your original photo.',
+            icon: <IconStar />,
+            iconColor: 'text-yellow-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Red Carpet', base: 'posing together on a glamorous red carpet at a movie premiere. {celebrity} is standing next to the person.' },
+                { id: 'Coffee Shop', base: 'casually chatting and laughing with {celebrity} at a cozy, stylish coffee shop.' },
+                { id: 'Side-by-Side', base: 'Add {celebrity} into the photo, standing realistically right next to the person, smiling for the camera.' },
+                { id: 'Photobomb', base: '{celebrity} is photobombing the person from the original photo in a funny, playful way.' },
+            ]
+        },
+        mizoAttire: {
+            name: 'Mizo Traditional Attire',
+            description: 'Elegant portraits in traditional Mizo garments.',
+            icon: <IconFlower />,
+            iconColor: 'text-pink-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Puanchei', base: 'a Puanchei, the most colourful Mizo costume.' },
+                { id: 'Kawrchei', base: 'a Kawrchei, a beautiful blouse.' },
+                { id: 'Ngotekherh', base: 'a Ngotekherh, a traditional Mizo puan.' },
+            ]
+        },
+        figurines: {
+            name: 'Toys Miniature Me',
+            description: 'Your own collectible figurines.',
+            icon: <IconFigurine />,
+            iconColor: 'text-orange-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Vinyl Figure', base: 'A stylized collectible vinyl art toy of the person with minimalist features, standing on a shelf filled with other similar toys.' },
+                { id: 'Plushy Figure', base: 'A soft, cute plushy figure of the person with detailed fabric texture and stitching, sitting on a neatly made bed.' },
+                { id: 'Bobblehead', base: 'A realistic bobblehead figure of the person with an oversized head, displayed on a polished wooden desk next to a computer keyboard.' },
+            ]
+        },
+        y2kCybercore: {
+            name: 'Y2K Cybercore',
+            description: 'Futuristic, glossy looks from the year 2000.',
+            icon: <IconY2K />,
+            iconColor: 'text-cyan-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Music Video Star', base: 'as a pop star in a Y2K music video, with glossy lips, chrome clothing, and a background of abstract digital graphics.' },
+                { id: 'Cyber Runner', base: 'as a cyberpunk character in a neon-lit, rainy city street, with subtle glowing tech implants on their face.' },
+                { id: 'Holographic Glitch', base: 'as a glitching holographic projection with digital artifacts and a futuristic interface overlay.' },
+            ]
+        },
+        animeManga: {
+            name: 'Anime & Manga Styles',
+            description: 'Reimagine yourself in various anime art styles.',
+            icon: <IconAnime />,
+            iconColor: 'text-rose-400',
+            isPolaroid: false,
+            prompts: [
+                { id: "'90s Anime", base: "as a character in a '90s-style anime, with soft, nostalgic colors, film grain, and a dreamy city-pop background." },
+                { id: 'Modern Shonen', base: 'as the hero of a modern action manga, with dynamic, sharp lines, intense eyes, and an explosive energy aura.' },
+                { id: 'Ghibli-esque', base: 'as a character in a whimsical, Ghibli-inspired scene, with a hand-painted storybook background and a gentle, heartwarming expression.' },
+            ]
+        },
+        videoGameAvatars: {
+            name: 'Video Game Avatars',
+            description: 'Become a character from different gaming eras.',
+            icon: <IconVideoGame />,
+            iconColor: 'text-green-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Pixel Art', base: 'as a 16-bit RPG character sprite, with pixel-perfect details, ready for an adventure.' },
+                { id: 'AAA Concept Art', base: 'as a realistic character in the concept art for a modern AAA game, with detailed armor and a dramatic, cinematic background.' },
+                { id: 'Low-Poly PS1', base: 'as a character from a classic PlayStation 1 game, with nostalgic, low-poly 3D graphics and sharp, geometric features.' },
+            ]
+        },
+        stickerPack: {
+            name: 'Expressive Stickers',
+            description: 'Generate a pack of custom reaction stickers.',
+            icon: <IconSticker />,
+            iconColor: 'text-yellow-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Laughing', base: 'A vibrant, cartoonish sticker of the person laughing, with bold outlines and a transparent background.' },
+                { id: 'Crying', base: "A cute, anime-style 'chibi' sticker of the person crying dramatically with big, teary eyes, with a transparent background." },
+                { id: 'Mind-Blown', base: "An expressive sticker of the person's mind being blown, with an exploding head and vibrant colors, with a transparent background." },
+            ]
+        },
+        keychainCreator: {
+            name: "Keychain Creator",
+            description: "A realistic product photo of a keychain of you.",
+            icon: <IconKeychain />,
+            iconColor: 'text-blue-400',
+            isPolaroid: false,
+            prompts: [ { id: 'Keychain', base: '' } ]
+        },
+        decades: {
+            name: 'Time Traveler',
+            description: 'See yourself through the decades.',
+            icon: <IconHourglass />,
+            iconColor: 'text-blue-400',
+            isPolaroid: true,
+            prompts: [
+                { id: '1970s', base: 'A 1970s style portrait.' },
+                { id: '1980s', base: 'An 1980s style portrait.' },
+                { id: '1990s', base: 'A 1990s style portrait.' }
+            ]
+        },
+        styleLookbook: {
+            name: "Style Lookbook",
+            description: "Your personal fashion photoshoot.",
+            icon: <IconLookbook />,
+            iconColor: 'text-blue-400',
+            isPolaroid: false,
+            styles: ['Streetwear', 'Vintage', 'Goth', 'Minimalist', 'Old Money', '90s Grunge'],
+            prompts: [
+                { id: 'Look 1', base: 'a full-body shot, standing' },
+                { id: 'Look 2', base: 'a half-body shot, smiling' },
+                { id: 'Look 3', base: 'a candid walking shot' }
+            ]
+        },
+        eightiesMall: {
+            name: "'80s Mall Shoot",
+            description: "Totally tubular 1980s portraits.",
+            icon: <Icon80s />,
+            iconColor: 'text-teal-400',
+            isPolaroid: true,
+            prompts: [
+                { id: 'Glamour Shot', base: 'a classic glamour shot pose with soft focus and dramatic lighting.' },
+                { id: 'Casual Pose', base: 'casually leaning against a neon sign with a cool, relaxed expression.' },
+                { id: 'Action Pose', base: 'a fun action pose, like jumping in the air or playing an air guitar.' },
+            ]
+        },
+        hairStyler: {
+            name: "Hair Styler",
+            description: "Try on new hairstyles and colors.",
+            icon: <IconHair />,
+            iconColor: 'text-purple-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Short', base: 'a chic short haircut' },
+                { id: 'Medium', base: 'a stylish medium-length haircut' },
+                { id: 'Long', base: 'beautiful long hair' },
+                { id: 'Bob', base: 'a classic bob haircut' },
+                { id: 'Pixie', base: 'a trendy pixie cut' },
+                { id: 'Curls', base: 'vibrant, bouncy curls' },
+            ]
+        },
+        impossibleSelfies: {
+            name: "Impossible Pics",
+            description: "Photos that defy reality.",
+            icon: <IconImpossible />,
+            iconColor: 'text-indigo-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Moon', base: 'taking a selfie on the surface of the moon with Earth in the background.' },
+                { id: 'Dinosaur', base: 'running away from a giant T-Rex in a prehistoric jungle.' },
+                { id: 'Underwater', base: 'exploring a vibrant coral reef surrounded by colorful fish in a sunken city.' },
+            ]
+        },
+        headshots: {
+            name: "Pro Headshots",
+            description: "Professional profile pictures.",
+            icon: <IconHeadshot />,
+            iconColor: 'text-gray-400',
+            isPolaroid: false,
+            prompts: [
+                { id: 'Corporate', base: 'wearing professional business attire (like a suit jacket or blouse)' },
+                { id: 'Creative', base: 'wearing smart-casual attire (like a stylish sweater or button-down shirt)' },
+                { id: 'Tech', base: 'wearing a clean, modern outfit (like a simple t-shirt or polo shirt)' },
+            ]
+        },
+    }), []);
+
+    const regenerateImageAtIndex = useCallback(async (imageIndex: number) => {
+        if (!generatedImages[imageIndex]) return;
+        setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'pending' } : img));
+        setError(null);
+    
+        const activeTemplate = templates[template!];
+        let promptsForGeneration = template === 'hairStyler' ? activeTemplate.prompts.filter(p => selectedHairStyles.includes(p.id)) : activeTemplate.prompts;
+        if (template === 'hairStyler' && isCustomHairActive && customHairStyle.trim()) promptsForGeneration.push({ id: customHairStyle, base: customHairStyle });
+    
+        const prompt = promptsForGeneration[imageIndex];
+        if (!prompt) {
+            setError("Could not find the prompt to regenerate.");
+            setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'failed' } : img));
+            return;
+        }
+    
+        try {
+            if (!uploadedImage) throw new Error("No uploaded image found for regeneration.");
+            const modelInstruction = getModelInstruction(template!, prompt, { headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText });
+            const imageUrl = await generateImageWithRetry(modelInstruction, uploadedImage.split(',')[1]);
+            const watermarkedImageUrl = await addWatermark(imageUrl);
+            setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'success', imageUrl: watermarkedImageUrl } : img));
+        } catch (err) {
+            setError(`Oops! Regeneration for "${prompt.id}" failed. Please try again.`);
+            setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'failed' } : img));
+        }
+    }, [generatedImages, template, uploadedImage, templates, selectedHairStyles, isCustomHairActive, customHairStyle, headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText, generateImageWithRetry]);
+    
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setIsUploading(true);
+            setError(null);
+            try {
+                setUploadedImage(await toBase64(file));
+                setGeneratedImages([]); 
+            } catch (err) {
+                setError("That image couldn't be processed. Please try another file.");
+            } finally {
+                setIsUploading(false);
+            }
+        }
+    };
+    
+    const handleCaptureConfirm = (imageDataUrl: string) => {
+        setUploadedImage(imageDataUrl);
+        setGeneratedImages([]);
+        setError(null);
+    };
+
+    const handleGenerateClick = useCallback(async () => {
+        if (generationCount <= 0) {
+            setError("You've reached your generation limit for today.");
+            return;
+        }
+        if (!uploadedImage || !template) {
+            setError(!uploadedImage ? "Please upload a photo!" : "Please select a theme!");
+            return;
+        }
+        
+        if (template === 'styleLookbook' && (lookbookStyle === '' || (lookbookStyle === 'Other' && !customLookbookStyle.trim()))) {
+            setError("Please choose or enter a fashion style!");
+            return;
+        }
+        if (template === 'hairStyler' && selectedHairStyles.length === 0 && (!isCustomHairActive || !customHairStyle.trim())) {
+            setError("Please select at least one hairstyle!");
+            return;
+        }
+        if (template === 'celebrity' && !celebrityName.trim()) {
+            setError("Please enter the name of the celebrity!");
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+        setGeneratedImages([]);
+        
+        const currentTimestamp = localStorage.getItem('generationResetTimestamp');
+        if (!currentTimestamp) {
+            const newResetTimestamp = new Date().getTime() + 24 * 60 * 60 * 1000;
+            localStorage.setItem('generationResetTimestamp', newResetTimestamp.toString());
+        }
+        const newCount = generationCount - 1;
+        setGenerationCount(newCount);
+        localStorage.setItem('generationCount', newCount.toString());
+
+        setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+
+        const imageWithoutPrefix = uploadedImage.split(',')[1];
+        const activeTemplate = templates[template];
+        
+        let dynamicStyleForAlbum = '';
+        if (template === 'eightiesMall') {
+            setIsSettingUp(true);
+            try {
+                dynamicStyleForAlbum = await generateDynamicPrompt("A specific, creative, and detailed style for an 80s mall portrait studio photoshoot.");
+                setCurrentAlbumStyle(dynamicStyleForAlbum);
+            } catch(e) {
+                setError("Could not generate a photoshoot style. Please try again.");
+                setIsLoading(false);
+                setIsSettingUp(false);
+                return;
+            }
+            setIsSettingUp(false);
+        } else {
+            setCurrentAlbumStyle(''); 
+        }
+
+        let promptsForGeneration = activeTemplate.prompts;
+        if (template === 'hairStyler') {
+            promptsForGeneration = activeTemplate.prompts.filter(p => selectedHairStyles.includes(p.id));
+            if (isCustomHairActive && customHairStyle.trim()) {
+                promptsForGeneration.push({ id: customHairStyle, base: customHairStyle });
+            }
+        }
+
+        setGeneratedImages(promptsForGeneration.map(p => ({ id: p.id, status: 'pending', imageUrl: null })));
+
+        for (let i = 0; i < promptsForGeneration.length; i++) {
+            const p = promptsForGeneration[i];
+            try {
+                const modelInstruction = getModelInstruction(template, p, { headshotExpression, headshotPose, currentAlbumStyle: dynamicStyleForAlbum, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText });
+                const imageUrl = await generateImageWithRetry(modelInstruction, imageWithoutPrefix);
+                const watermarkedImageUrl = await addWatermark(imageUrl);
+                setGeneratedImages(prev => prev.map((img, index) => index === i ? { ...img, status: 'success', imageUrl: watermarkedImageUrl } : img));
+            } catch (err) {
+                setGeneratedImages(prev => prev.map((img, index) => index === i ? { ...img, status: 'failed' } : img));
+                 if (err instanceof Error && err.message.includes('API key not valid')) {
+                    break; 
+                }
+            }
+        }
+        setIsLoading(false);
+    }, [uploadedImage, template, templates, lookbookStyle, customLookbookStyle, selectedHairStyles, isCustomHairActive, customHairStyle, hairColors, headshotExpression, headshotPose, celebrityName, keychainText, generationCount, generateDynamicPrompt, generateImageWithRetry]);
+
+    const triggerDownload = (href: string, fileName: string) => {
+        const link = document.createElement('a');
+        link.href = href;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const handleDownloadRequest = async (imageUrl: string, era: string, ratio: string) => {
+        try {
+            const shouldAddLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration', 'celebrity', 'keychainCreator'].includes(template!);
+            const framedImageUrl = await createSingleFramedImage(imageUrl, ratio, shouldAddLabel ? era : null);
+            triggerDownload(framedImageUrl, `khiangtevillain-ai-${era.toLowerCase().replace(/\s+/g, '-')}.png`);
+        } catch (err) {
+            setError(`Could not prepare that image for download.`);
+        }
+    };
+
+    const handleShareRequest = async (imageUrl: string, era: string) => {
+        if (!navigator.share) {
+            setError("Sharing is not supported on your browser.");
+            return;
+        }
+    
+        try {
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            const file = new File([blob], `khiangtevillain-ai-${era.toLowerCase().replace(/\s+/g, '-')}.png`, { type: blob.type });
+    
+            // @ts-ignore
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: `My AI Photo: ${era}`,
+                    text: "Check out this AI image I created with Khiangtevillain's AI Image Generator! #AIart #Gemini #Khiangtevillain",
+                    url: window.location.href
+                });
+            } else {
+                 setError("Your browser cannot share this type of file.");
+            }
+        } catch (error) {
+            if (error instanceof Error && error.name !== 'AbortError') {
+                console.error("Sharing failed:", error);
+                setError("Something went wrong while trying to share.");
+            }
+        }
+    };
+    
+    const handleAlbumDownloadRequest = async () => {
+        if (isDownloadingAlbum) return;
+        setIsDownloadingAlbum(true);
+        setError(null);
+    
+        try {
+            const successfulImages = generatedImages.filter(img => img.status === 'success' && img.imageUrl);
+            if (successfulImages.length === 0) {
+                setError("No successful images to download.");
+                return;
+            }
+    
+            const zip = new JSZip();
+            
+            for (let i = 0; i < successfulImages.length; i++) {
+                const img = successfulImages[i];
+                const response = await fetch(img.imageUrl!);
+                const blob = await response.blob();
+                const fileName = `khiangtevillain-ai-${img.id.toLowerCase().replace(/\s+/g, '-')}-${i + 1}.png`;
+                zip.file(fileName, blob);
+            }
+    
+            const content = await zip.generateAsync({ type: "blob" });
+            const url = window.URL.createObjectURL(content);
+            triggerDownload(url, "khiangtevillain-ai-album.zip");
+            window.URL.revokeObjectURL(url);
+    
+        // Fix: Corrected syntax for catch block. The incorrect arrow function syntax was causing parsing errors.
+        } catch (err) {
+            console.error("Failed to create or download album:", err);
+            setError("Sorry, the album download failed.");
+        } finally {
+            setIsDownloadingAlbum(false);
+        }
+    };
+
+    const handleTemplateSelect = (templateId: string) => {
+        setTemplate(templateId);
+        setHeadshotExpression('Friendly Smile');
+        setHeadshotPose('Forward');
+        setLookbookStyle('');
+        setCustomLookbookStyle('');
+        setHairColors([]);
+        setSelectedHairStyles([]);
+        setCustomHairStyle('');
+        setIsCustomHairActive(false);
+        setCelebrityName('');
+        setKeychainText('');
+    };
+
+    const handleStartOver = () => {
+        setGeneratedImages([]);
+        setUploadedImage(null);
+        setError(null);
+        setTemplate(null);
+        handleTemplateSelect('');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const totalSelectedStyles = selectedHairStyles.length + (isCustomHairActive && customHairStyle.trim() ? 1 : 0);
+    const progress = generatedImages.length > 0 ? (generatedImages.filter(img => img.status !== 'pending').length / generatedImages.length) * 100 : 0;
+    
+    return (
+        <>
+           {!isUnlocked && 
+                <AccessModal 
+                    value={accessCodeInput}
+                    onChange={(e) => setAccessCodeInput(e.target.value)}
+                    onSubmit={handleUnlockAttempt}
+                    error={unlockError}
+                />
+            }
+            <div className={`transition-all duration-500 ${!isUnlocked ? 'filter blur-md pointer-events-none' : ''}`}>
+                <CameraModal isOpen={isCameraOpen} onClose={() => setIsCameraOpen(false)} onCapture={handleCaptureConfirm} />
+
+                <div className="bg-slate-950/0 text-gray-200 min-h-screen flex flex-col items-center p-4 pb-20 relative z-10">
+                    <ErrorNotification message={error} onDismiss={() => setError(null)} />
+                    
+                    <div className="w-full max-w-5xl mx-auto">
+                        <header className="text-center mt-12 mb-16 animate-fade-in-down">
+                            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase flex flex-col items-center">
+                                <span className="glitch-text" data-text="KHIANGTEVILLAIN AI IMAGES">
+                                    KHIANGTEVILLAIN AI IMAGES
+                                </span>
+                                <span className="text-pink-500 text-5xl md:text-6xl mt-1" style={{ textShadow: '0 0 5px #ec4899, 0 0 15px #ec4899, 0 0 30px #ec4899' }}>
+                                    GENERATOR
+                                </span>
+                            </h1>
+                            <p className="mt-4 text-lg text-slate-400">Nano-Banana Preview</p>
+                            <div className="flex justify-center gap-x-8 gap-y-4 mt-6 flex-wrap">
+                                <a href="https://www.instagram.com/khiangte.villain" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-pink-400 transition-colors font-medium">
+                                    <IconInstagram />
+                                    <span>@khiangte.villain</span>
+                                </a>
+                                <a href="https://www.youtube.com/@khiangtevillainAi" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors font-medium">
+                                    <IconYouTube />
+                                    <span>@khiangtevillainAi</span>
+                                </a>
+                            </div>
+                        </header>
+
+                        <main>
+                            <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8">
+                                <div className="bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-cyan-400/20 animate-fade-in-up" style={{boxShadow: '0 0 40px rgba(56, 189, 248, 0.1)'}}>
+                                    <h2 className="text-xl font-semibold mb-4 text-cyan-300 uppercase tracking-widest">1. YOUR PHOTO</h2>
+                                    <div 
+                                      className="w-full aspect-square bg-slate-950/50 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 overflow-hidden relative border-2 border-cyan-400/30 shadow-[0_0_15px_rgba(56,189,248,0.15)] hover:border-cyan-400/70 hover:shadow-[0_0_25px_rgba(56,189,248,0.3)]" 
+                                      onClick={() => !uploadedImage && fileInputRef.current?.click()}
+                                    >
+                                        {isUploading ? <div className="flex flex-col items-center"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-pink-500"></div><p className="text-gray-400 mt-4">Uploading...</p></div> : uploadedImage ? <img src={uploadedImage} alt="Uploaded preview" className="w-full h-full object-contain" /> : <div className="flex flex-col items-center justify-center p-6 text-center text-cyan-400/70"><IconCameraOutline /><p className="mt-4 text-lg text-cyan-300">Click or drag a file</p><button onClick={(e) => { e.stopPropagation(); setIsCameraOpen(true); }} className="mt-4 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-slate-800/60 hover:bg-slate-700/80 transition-colors"><IconCamera />USE CAMERA</button></div>}
+                                    </div>
+                                    {uploadedImage && !isUploading && <div className="flex flex-col sm:flex-row gap-4 mt-4"><Button onClick={() => fileInputRef.current?.click()} className="flex-1">Change File</Button><Button onClick={() => setIsCameraOpen(true)} className="flex-1"><div className="flex items-center justify-center gap-2"><IconCamera /><span>Use Camera</span></div></Button></div>}
+                                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/png, image/jpeg" className="hidden" />
+
+                                    <div className="mt-6 text-center">
+                                         <CircuitGraphic>
+                                            <div className="text-sm text-cyan-300/80">
+                                                {generationCount > 0 ? (
+                                                    <p>Generations remaining today: <span className="font-bold text-cyan-300">{generationCount} / 3</span></p>
+                                                ) : (
+                                                    <p className="font-bold text-pink-400">No generations left today</p>
+                                                )}
+                                            </div>
+                                         </CircuitGraphic>
+
+                                        <button 
+                                            onClick={handleGenerateClick} 
+                                            disabled={!uploadedImage || !template || isLoading || isUploading || isSettingUp || generationCount <= 0} 
+                                            className="mt-6 w-full text-base font-bold tracking-wider uppercase rounded-lg p-3 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden bg-pink-600 border border-pink-500 shadow-lg shadow-pink-500/30 hover:bg-pink-500"
+                                        >
+                                            <div className="relative flex items-center justify-center gap-2.5 text-white">
+                                                {isLoading || isSettingUp ? 
+                                                    <><div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>{isSettingUp ? "Setting up..." : `Generating...`}</> : 
+                                                generationCount <= 0 ? 
+                                                    <>Limit Reached</> : 
+                                                    <><IconSparkles /><span>GENERATE PHOTOS</span></>}
+                                            </div>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-cyan-400/20 animate-fade-in-up styled-scrollbar overflow-y-auto" style={{boxShadow: '0 0 40px rgba(56, 189, 248, 0.1)', maxHeight: '720px'}}>
+                                    <h2 className="text-xl font-semibold mb-4 text-cyan-300 uppercase tracking-widest">2. CHOOSE THEME</h2>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                        {Object.entries(templates).map(([key, data]) => <TemplateCard key={key} id={key} name={data.name} icon={data.icon} description={data.description} isSelected={template === key} onSelect={handleTemplateSelect} iconColor={data.iconColor} />)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div ref={resultsRef}>
+                                {isSettingUp && <div className="text-center my-20 flex flex-col items-center p-10 bg-slate-900/70 rounded-2xl"><div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-pink-500 mb-6"></div><p className="text-2xl text-pink-400 font-semibold tracking-wider italic">Teasing our hair and firing up the lasers...</p><p className="text-slate-400 mt-2">Generating a totally tubular '80s photoshoot style!</p></div>}
+                                {(isLoading || generatedImages.length > 0) && !isSettingUp && (
+                                    <div className="mt-16">
+                                        <h2 className="text-3xl font-bold text-white mb-8 text-center font-orbitron">YOUR GENERATED PHOTOS</h2>
+                                        {isLoading && <div className="w-full max-w-4xl mx-auto mb-8 text-center"><div className="bg-slate-800 rounded-full h-3 overflow-hidden shadow-md"><div className="bg-gradient-to-r from-cyan-400 to-pink-500 h-3 rounded-full transition-all duration-500" style={{width: `${progress}%`}}></div></div><p className="text-slate-400 mt-4 text-sm">Please keep this window open while your photos are being generated.</p></div>}
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
+                                            {generatedImages.map((img, index) => {
+                                                const isPolaroid = templates[template!]?.isPolaroid ?? false;
+                                                const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration', 'celebrity', 'keychainCreator', 'y2kCybercore', 'animeManga', 'videoGameAvatars', 'stickerPack'].includes(template!);
+                                                switch (img.status) {
+                                                    case 'success': return <PhotoDisplay key={`${img.id}-${index}-s`} era={img.id} imageUrl={img.imageUrl!} onDownload={handleDownloadRequest} onRegenerate={() => regenerateImageAtIndex(index)} onShare={() => handleShareRequest(img.imageUrl!, img.id)} isPolaroid={isPolaroid} index={index} showLabel={showLabel} />;
+                                                    case 'failed': return <ErrorCard key={`${img.id}-${index}-f`} era={img.id} isPolaroid={isPolaroid} onRegenerate={() => regenerateImageAtIndex(index)} showLabel={showLabel} />;
+                                                    default: return <LoadingCard key={`${img.id}-${index}-p`} era={img.id} isPolaroid={isPolaroid} showLabel={showLabel} />;
+                                                }
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+                                {!isLoading && generatedImages.length > 0 && <div className="text-center mt-16 mb-12 flex flex-col sm:flex-row justify-center items-center gap-6"><Button onClick={handleStartOver}>Start Over</Button><Button onClick={handleAlbumDownloadRequest} primary disabled={isDownloadingAlbum}>{isDownloadingAlbum ? <div className="flex items-center gap-2"><div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div><span>Zipping...</span></div> : <div className="flex items-center gap-2"><IconDownload /><span>Download Album</span></div>}</Button></div>}
+                            </div>
+                        </main>
+                        <footer className="text-center mt-16 py-8 border-t border-slate-800 text-slate-500 text-sm animate-fade-in">
+                            <p>copyright khiangtevillain 2025</p>
+                            <p className="mt-1">Workspace by J&R business Aizawl, Mizoram</p>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+};
+
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error("Could not find root element to mount to");
+}
+
+const root = ReactDOM.createRoot(rootElement);
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
