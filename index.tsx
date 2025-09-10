@@ -1,10 +1,8 @@
-
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
-import { GoogleGenAI, Modality } from '@google/genai';
 
-// Fix: Initialize GoogleGenAI with API key from environment variable for security and correctness.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// IMPORTANT: Replace this with your actual Google Cloud Function URL after deployment.
+const CLOUD_FUNCTION_URL = 'YOUR_CLOUD_FUNCTION_URL_HERE';
 
 // The secret code to unlock the app. Share this with your followers.
 const ACCESS_CODE = "NANO-VILLAIN-2025";
@@ -191,6 +189,11 @@ const getModelInstruction = (template: string, prompt: { id: string; base: strin
             const textLabel = keychainText && keychainText.trim() !== '' ? keychainText.trim() : "KhiangteVillain";
             return `${baseInstruction} Create a 9:16 ultra-realistic product photograph with soft studio lighting and glossy highlights. The photo should feature a realistic action figure keychain of the person from the uploaded image, designed with lifelike details and natural proportions. The figure must have a soft, cheerful expression, a realistic face sculpt, and a premium collectible look. The keychain strap should be a bright color that complements the character's clothing and feature extra bold white text that reads "${textLabel}". A realistic human hand should be holding the keychain ring, with fingers gently pinching it, captured sharply in focus. The background must be softly blurred with inside shop of the key chain interior lighting, cinematic bokeh, and a professional product showcase aesthetic.`;
         }
+        case 'y2kCybercore':
+        case 'animeManga':
+        case 'videoGameAvatars':
+        case 'stickerPack':
+            return `${baseInstruction} Transform the person to fit the following scene: ${prompt.base}.`;
         default:
             return `Create an image based on the reference photo and this prompt: ${prompt.base}`;
     }
@@ -210,6 +213,10 @@ const Icon80s = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8
 const IconHair = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.9 0 3.6.8 4.9 2.1l-1.4 1.4c-.9-.9-2.2-1.5-3.5-1.5s-2.6.6-3.5 1.5L7.1 4.1C8.4 2.8 10.1 2 12 2zm8.9 7.1c-1.7-1.7-4-2.1-6.2-1.1l-3.4-3.4c-2.2-1-4.5-.6-6.2 1.1l3.4 3.4c-2.2 1-2.6 3.3-1.1 5.1.7.8 1.6 1.3 2.6 1.5l4.3-4.3c1.9 0 3.6-.8 4.9-2.1l1.4 1.4C19.2 13.4 21 12.7 22 11c0-1.9-.8-3.6-2.1-4.9zM2 12c0-1.5.8-2.8 2.1-3.5L2.7 7.1C1 8.4 0 10.1 0 12s1 3.6 2.7 4.9l1.4-1.4C3.2 14.8 2 13.5 2 12zm17.9 2.9c1.6-1.7 1.2-4.1-1.1-5.1l-3.4 3.4c1.6 1.7 1.2 4.1-1.1 5.1l-4.3 4.3c1.9 0 3.6-.8 4.9-2.1l1.4 1.4C19.2 20.6 21 19.9 22 18c0-1.9-.8-3.6-2.1-4.9z"/></svg>;
 const IconImpossible = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M15 11.26V9.45c0-1.72-1.28-3.1-2.96-3.19C10.37 6.17 9 7.42 9 9v2.26C6.17 11.83 4 14.61 4 18h16c0-3.39-2.17-6.17-5-6.74zM12 20c-1.1 0-2-.9-2-2h4c0 1.1-.9 2-2 2zM13.2 5.09c.45-.37.79-.83.99-1.34l.2-1.3C14.48 1.7 13.82 1 13.06 1H11c-.75 0-1.41.69-1.2 1.45l.2 1.3c.2.51.55.97 1 1.34C9.17 6.17 8 8.42 8 11h8c0-2.58-1.17-4.83-3.2-5.91z"/></svg>;
 const IconHeadshot = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>;
+const IconY2K = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L9.91 8.09 2 10l7.91 1.91L12 20l2.09-7.91L22 10l-7.91-1.91L12 0z"/></svg>;
+const IconAnime = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 10c-2.48 0-4.5-2.02-4.5-4.5S9.52 5.5 12 5.5 16.5 7.52 16.5 10 14.48 14.5 12 14.5zm0-7C10.62 7.5 9.5 8.62 9.5 10s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S13.38 7.5 12 7.5z"/></svg>;
+const IconVideoGame = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 9H8v-3H5v-2h3V7h3v3h2v2h-2v3zm4.5 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>;
+const IconSticker = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-6c.78 2.34 2.72 4 5 4s4.22-1.66 5-4H7zM9 12c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm6 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>;
 
 const IconSparkles = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" /></svg>;
 const IconOptions = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" /></svg>;
@@ -220,11 +227,11 @@ const IconX = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox=
 const IconInstagram = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664 4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.802C9.042 3.965 8.72 3.978 7.474 4.034c-2.43.111-3.64 1.317-3.75 3.75-.056 1.246-.068 1.568-.068 4.216s.012 2.97.068 4.216c.11 2.43 1.317 3.64 3.75 3.75 1.246.056 1.568.068 4.216.068s2.97-.012 4.216-.068c2.43-.11 3.64-1.317 3.75-3.75.056-1.246.068-1.568-.068-4.216s-.012-2.97-.068-4.216c-.11-2.43-1.317-3.64-3.75-3.75-1.246-.056-1.568-.068-4.216-.068zm0 5.438c-2.273 0-4.106 1.833-4.106 4.106s1.833 4.106 4.106 4.106 4.106-1.833 4.106-4.106-1.833-4.106-4.106-4.106zm0 6.55c-1.348 0-2.444-1.096-2.444-2.444s1.096-2.444 2.444-2.444 2.444 1.096 2.444 2.444-1.096 2.444-2.444-2.444zM16.949 6.05a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"></path></svg>;
 const IconYouTube = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path></svg>;
 const IconLock = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>;
+const IconShare = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-3"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.186 2.25 2.25 0 0 0-3.933 2.186Z" /></svg>;
 
 
 // --- React Components ---
 
-// Fix: Add 'type' prop to Button component to allow specifying button type (e.g., 'submit').
 const Button: React.FC<{ children: React.ReactNode, onClick?: React.MouseEventHandler<HTMLButtonElement>, disabled?: boolean, primary?: boolean, className?: string, type?: 'submit' | 'reset' | 'button' }> = ({ children, onClick, disabled, primary = false, className = '', type }) => {
     const baseClass = "px-6 py-2 rounded-md font-semibold tracking-wider uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
     const themeClass = primary 
@@ -234,7 +241,7 @@ const Button: React.FC<{ children: React.ReactNode, onClick?: React.MouseEventHa
     return <button type={type} onClick={onClick} disabled={disabled} className={`${baseClass} ${themeClass} ${className}`}>{children}</button>;
 };
 
-const PhotoDisplay: React.FC<{ era: string, imageUrl: string, onDownload: (url: string, era: string, ratio: string) => void, onRegenerate: () => void, isPolaroid?: boolean, index?: number, showLabel?: boolean }> = ({ era, imageUrl, onDownload, onRegenerate, isPolaroid = true, index=0, showLabel = true }) => {
+const PhotoDisplay: React.FC<{ era: string, imageUrl: string, onDownload: (url: string, era: string, ratio: string) => void, onRegenerate: () => void, onShare: () => void, isPolaroid?: boolean, index?: number, showLabel?: boolean }> = ({ era, imageUrl, onDownload, onRegenerate, onShare, isPolaroid = true, index=0, showLabel = true }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -269,6 +276,10 @@ const PhotoDisplay: React.FC<{ era: string, imageUrl: string, onDownload: (url: 
                     <div className="absolute right-0 top-12 mt-2 w-48 origin-top-right bg-black/80 backdrop-blur-md rounded-lg shadow-2xl ring-1 ring-white/10 text-white text-sm flex flex-col p-1 animate-fade-in">
                         <span className="w-full text-left px-3 pt-2 pb-1 text-xs text-gray-500 uppercase tracking-wider">Actions</span>
                         <button onClick={() => { onRegenerate(); setIsMenuOpen(false); }} className="w-full text-left px-3 py-2 hover:bg-pink-500/20 rounded-md transition-colors">Regenerate</button>
+                        <button onClick={() => { onShare(); setIsMenuOpen(false); }} className="w-full text-left px-3 py-2 hover:bg-pink-500/20 rounded-md transition-colors flex items-center">
+                            <IconShare />
+                            <span>Share</span>
+                        </button>
                         <div className="my-1 h-px bg-white/10"></div>
                         <span className="w-full text-left px-3 pt-1 pb-1 text-xs text-gray-500 uppercase tracking-wider">Download</span>
                         <button onClick={() => { onDownload(imageUrl, era, '1:1'); setIsMenuOpen(false); }} className="w-full text-left px-3 py-2 hover:bg-pink-500/20 rounded-md transition-colors">Square (1:1)</button>
@@ -483,8 +494,6 @@ const AccessModal: React.FC<{ value: string, onChange: (e: React.ChangeEvent<HTM
 };
 
 
-// Fix: Defined types for the templates object to resolve errors where properties
-// on the `data` variable were not accessible due to being typed as 'unknown'.
 type TemplatePrompt = { id: string; base: string; };
 type TemplateData = {
     name: string;
@@ -631,11 +640,20 @@ const App: React.FC = () => {
     // --- API Helper Functions ---
     const generateDynamicPrompt = useCallback(async (themeDescription: string): Promise<string> => {
         try {
-            const response = await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
-                contents: `Generate a short, creative, and detailed style description for a photoshoot based on this theme: "${themeDescription}". The description should be a single sentence and sound cool.`,
+            const response = await fetch(CLOUD_FUNCTION_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    task: 'generateText',
+                    payload: {
+                        prompt: `Generate a short, creative, and detailed style description for a photoshoot based on this theme: "${themeDescription}". The description should be a single sentence and sound cool.`
+                    }
+                }),
             });
-            return response.text.trim();
+            if (!response.ok) throw new Error(`Server responded with ${response.status}`);
+            const data = await response.json();
+            if (data.error) throw new Error(data.error);
+            return data.text.trim();
         } catch (error) {
             console.error("Error generating dynamic prompt:", error);
             return "A retro 80s studio background with laser beams, neon geometric shapes, fog, and dramatic backlighting.";
@@ -643,34 +661,46 @@ const App: React.FC = () => {
     }, []);
 
     const generateImageWithRetry = useCallback(async (modelInstruction: string, imageWithoutPrefix: string, totalAttempts = 3): Promise<string> => {
+        if (!CLOUD_FUNCTION_URL || CLOUD_FUNCTION_URL === 'YOUR_CLOUD_FUNCTION_URL_HERE') {
+            throw new Error("Cloud Function URL is not configured in index.tsx.");
+        }
+        
         let lastError: Error | undefined;
         for (let attempt = 1; attempt <= totalAttempts; attempt++) {
             try {
-                const imagePart = { inlineData: { data: imageWithoutPrefix, mimeType: 'image/png' } };
-                const textPart = { text: modelInstruction };
-
-                const response = await ai.models.generateContent({
-                    model: 'gemini-2.5-flash-image-preview',
-                    contents: { parts: [textPart, imagePart] },
-                    config: { responseModalities: [Modality.IMAGE, Modality.TEXT] },
+                const response = await fetch(CLOUD_FUNCTION_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        task: 'generateImage',
+                        payload: {
+                            instruction: modelInstruction,
+                            image: imageWithoutPrefix
+                        }
+                    }),
                 });
 
-                if (response.candidates && response.candidates.length > 0) {
-                  for (const part of response.candidates[0].content.parts) {
-                    if (part.inlineData && part.inlineData.data) {
-                      return `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
-                    }
-                  }
+                if (!response.ok) {
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
                 }
                 
+                if (data.imageUrl) {
+                    return data.imageUrl;
+                }
+
                 lastError = new Error("API returned no image data.");
-                console.warn(`Attempt ${attempt}/${totalAttempts}: ${lastError.message}`);
 
             } catch (error) {
                 lastError = error as Error;
                 console.error(`Attempt ${attempt}/${totalAttempts} failed:`, error);
-                if (error instanceof Error && error.message.includes('API key not valid')) {
-                    setError("The API key is not valid. Please ensure it is configured correctly in the environment.");
+                if (error instanceof Error && error.message.includes('Cloud Function')) {
+                    setError("The backend function is not configured. Please follow the deployment steps.");
                     throw error;
                 }
             }
@@ -688,514 +718,4 @@ const App: React.FC = () => {
     const addHairColor = () => { if (hairColors.length < 2) setHairColors(p => [...p, '#ff00ff']); };
     const removeHairColor = (index: number) => setHairColors(p => p.filter((_, i) => i !== index));
 
-    const handleHairStyleSelect = (styleId: string) => {
-        if (styleId === 'Other') {
-            setIsCustomHairActive(prev => {
-                if (!prev && (selectedHairStyles.length + 1) > 6) { setError("You can select a maximum of 6 styles."); return prev; }
-                if (prev) setCustomHairStyle('');
-                return !prev;
-            });
-            return;
-        }
-        setSelectedHairStyles(prev => {
-            if (prev.includes(styleId)) return prev.filter(s => s !== styleId);
-            if (prev.length + (isCustomHairActive ? 1 : 0) < 6) return [...prev, styleId];
-            setError("You can select a maximum of 6 styles.");
-            return prev;
-        });
-    };
-
-    const templates: { [key: string]: TemplateData } = useMemo(() => ({
-        photoRestoration: {
-            name: 'Photo Restoration',
-            description: 'Repair and enhance old photographs.',
-            icon: <IconEnhance />,
-            iconColor: 'text-cyan-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Colorize', base: 'Colorize this black and white photo with realistic, natural colors.' },
-                { id: 'Repair Damage', base: 'Repair physical damage like cracks, scratches, dust, and tears from this photo.' },
-                { id: 'Enhance Clarity', base: 'Improve the overall sharpness, clarity, and focus of this slightly blurry photo.' },
-            ]
-        },
-        pixarStyle: {
-            name: 'Pixar-style Me',
-            description: 'Become a 3D animated character.',
-            icon: <IconPixar />,
-            iconColor: 'text-blue-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Adventurer', base: 'as a brave adventurer in a lush, magical jungle.' },
-                { id: 'Scientist', base: 'as a quirky scientist in a chaotic, colorful laboratory.' },
-                { id: 'Musician', base: 'as a passionate musician on a brightly lit stage.' },
-            ]
-        },
-        celebrity: {
-            name: 'Stand with a Celebrity',
-            description: 'Pose with your favorite star, in new scenes or in your original photo.',
-            icon: <IconStar />,
-            iconColor: 'text-yellow-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Red Carpet', base: 'posing together on a glamorous red carpet at a movie premiere. {celebrity} is standing next to the person.' },
-                { id: 'Coffee Shop', base: 'casually chatting and laughing with {celebrity} at a cozy, stylish coffee shop.' },
-                { id: 'Side-by-Side', base: 'Add {celebrity} into the photo, standing realistically right next to the person, smiling for the camera.' },
-                { id: 'Photobomb', base: '{celebrity} is photobombing the person from the original photo in a funny, playful way.' },
-            ]
-        },
-        mizoAttire: {
-            name: 'Mizo Traditional Attire',
-            description: 'Elegant portraits in traditional Mizo garments.',
-            icon: <IconFlower />,
-            iconColor: 'text-pink-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Puanchei', base: 'a Puanchei, the most colourful Mizo costume.' },
-                { id: 'Kawrchei', base: 'a Kawrchei, a beautiful blouse.' },
-                { id: 'Ngotekherh', base: 'a Ngotekherh, a traditional Mizo puan.' },
-            ]
-        },
-        figurines: {
-            name: 'Toys Miniature Me',
-            description: 'Your own collectible figurines.',
-            icon: <IconFigurine />,
-            iconColor: 'text-orange-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Vinyl Figure', base: 'A stylized collectible vinyl art toy of the person with minimalist features, standing on a shelf filled with other similar toys.' },
-                { id: 'Plushy Figure', base: 'A soft, cute plushy figure of the person with detailed fabric texture and stitching, sitting on a neatly made bed.' },
-                { id: 'Bobblehead', base: 'A realistic bobblehead figure of the person with an oversized head, displayed on a polished wooden desk next to a computer keyboard.' },
-            ]
-        },
-        keychainCreator: {
-            name: "Keychain Creator",
-            description: "A realistic product photo of a keychain of you.",
-            icon: <IconKeychain />,
-            iconColor: 'text-blue-400',
-            isPolaroid: false,
-            prompts: [ { id: 'Keychain', base: '' } ]
-        },
-        decades: {
-            name: 'Time Traveler',
-            description: 'See yourself through the decades.',
-            icon: <IconHourglass />,
-            iconColor: 'text-blue-400',
-            isPolaroid: true,
-            prompts: [
-                { id: '1970s', base: 'A 1970s style portrait.' },
-                { id: '1980s', base: 'An 1980s style portrait.' },
-                { id: '1990s', base: 'A 1990s style portrait.' }
-            ]
-        },
-        styleLookbook: {
-            name: "Style Lookbook",
-            description: "Your personal fashion photoshoot.",
-            icon: <IconLookbook />,
-            iconColor: 'text-blue-400',
-            isPolaroid: false,
-            styles: ['Streetwear', 'Vintage', 'Goth', 'Minimalist', 'Old Money', '90s Grunge'],
-            prompts: [
-                { id: 'Look 1', base: 'a full-body shot, standing' },
-                { id: 'Look 2', base: 'a half-body shot, smiling' },
-                { id: 'Look 3', base: 'a candid walking shot' }
-            ]
-        },
-        eightiesMall: {
-            name: "'80s Mall Shoot",
-            description: "Totally tubular 1980s portraits.",
-            icon: <Icon80s />,
-            iconColor: 'text-teal-400',
-            isPolaroid: true,
-            prompts: [
-                { id: 'Glamour Shot', base: 'a classic glamour shot pose with soft focus and dramatic lighting.' },
-                { id: 'Casual Pose', base: 'casually leaning against a neon sign with a cool, relaxed expression.' },
-                { id: 'Action Pose', base: 'a fun action pose, like jumping in the air or playing an air guitar.' },
-            ]
-        },
-        hairStyler: {
-            name: "Hair Styler",
-            description: "Try on new hairstyles and colors.",
-            icon: <IconHair />,
-            iconColor: 'text-purple-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Short', base: 'a chic short haircut' },
-                { id: 'Medium', base: 'a stylish medium-length haircut' },
-                { id: 'Long', base: 'beautiful long hair' },
-                { id: 'Bob', base: 'a classic bob haircut' },
-                { id: 'Pixie', base: 'a trendy pixie cut' },
-                { id: 'Curls', base: 'vibrant, bouncy curls' },
-            ]
-        },
-        impossibleSelfies: {
-            name: "Impossible Pics",
-            description: "Photos that defy reality.",
-            icon: <IconImpossible />,
-            iconColor: 'text-indigo-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Moon', base: 'taking a selfie on the surface of the moon with Earth in the background.' },
-                { id: 'Dinosaur', base: 'running away from a giant T-Rex in a prehistoric jungle.' },
-                { id: 'Underwater', base: 'exploring a vibrant coral reef surrounded by colorful fish in a sunken city.' },
-            ]
-        },
-        headshots: {
-            name: "Pro Headshots",
-            description: "Professional profile pictures.",
-            icon: <IconHeadshot />,
-            iconColor: 'text-gray-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Corporate', base: 'wearing professional business attire (like a suit jacket or blouse)' },
-                { id: 'Creative', base: 'wearing smart-casual attire (like a stylish sweater or button-down shirt)' },
-                { id: 'Tech', base: 'wearing a clean, modern outfit (like a simple t-shirt or polo shirt)' },
-            ]
-        },
-    }), []);
-
-    const regenerateImageAtIndex = useCallback(async (imageIndex: number) => {
-        if (!generatedImages[imageIndex]) return;
-        setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'pending' } : img));
-        setError(null);
-    
-        const activeTemplate = templates[template!];
-        let promptsForGeneration = template === 'hairStyler' ? activeTemplate.prompts.filter(p => selectedHairStyles.includes(p.id)) : activeTemplate.prompts;
-        if (template === 'hairStyler' && isCustomHairActive && customHairStyle.trim()) promptsForGeneration.push({ id: customHairStyle, base: customHairStyle });
-    
-        const prompt = promptsForGeneration[imageIndex];
-        if (!prompt) {
-            setError("Could not find the prompt to regenerate.");
-            setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'failed' } : img));
-            return;
-        }
-    
-        try {
-            if (!uploadedImage) throw new Error("No uploaded image found for regeneration.");
-            const modelInstruction = getModelInstruction(template!, prompt, { headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText });
-            const imageUrl = await generateImageWithRetry(modelInstruction, uploadedImage.split(',')[1]);
-            const watermarkedImageUrl = await addWatermark(imageUrl);
-            setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'success', imageUrl: watermarkedImageUrl } : img));
-        } catch (err) {
-            setError(`Oops! Regeneration for "${prompt.id}" failed. Please try again.`);
-            setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'failed' } : img));
-        }
-    }, [generatedImages, template, uploadedImage, templates, selectedHairStyles, isCustomHairActive, customHairStyle, headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText, generateImageWithRetry]);
-    
-    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            setIsUploading(true);
-            setError(null);
-            try {
-                setUploadedImage(await toBase64(file));
-                setGeneratedImages([]); 
-            } catch (err) {
-                setError("That image couldn't be processed. Please try another file.");
-            } finally {
-                setIsUploading(false);
-            }
-        }
-    };
-    
-    const handleCaptureConfirm = (imageDataUrl: string) => {
-        setUploadedImage(imageDataUrl);
-        setGeneratedImages([]);
-        setError(null);
-    };
-
-    const handleGenerateClick = useCallback(async () => {
-        if (generationCount <= 0) {
-            setError("You've reached your generation limit for today.");
-            return;
-        }
-        if (!uploadedImage || !template) {
-            setError(!uploadedImage ? "Please upload a photo!" : "Please select a theme!");
-            return;
-        }
-        
-        if (template === 'styleLookbook' && (lookbookStyle === '' || (lookbookStyle === 'Other' && !customLookbookStyle.trim()))) {
-            setError("Please choose or enter a fashion style!");
-            return;
-        }
-        if (template === 'hairStyler' && selectedHairStyles.length === 0 && (!isCustomHairActive || !customHairStyle.trim())) {
-            setError("Please select at least one hairstyle!");
-            return;
-        }
-        if (template === 'celebrity' && !celebrityName.trim()) {
-            setError("Please enter the name of the celebrity!");
-            return;
-        }
-
-        setIsLoading(true);
-        setError(null);
-        setGeneratedImages([]);
-        
-        const currentTimestamp = localStorage.getItem('generationResetTimestamp');
-        if (!currentTimestamp) {
-            const newResetTimestamp = new Date().getTime() + 24 * 60 * 60 * 1000;
-            localStorage.setItem('generationResetTimestamp', newResetTimestamp.toString());
-        }
-        const newCount = generationCount - 1;
-        setGenerationCount(newCount);
-        localStorage.setItem('generationCount', newCount.toString());
-
-        setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-
-        const imageWithoutPrefix = uploadedImage.split(',')[1];
-        const activeTemplate = templates[template];
-        
-        let dynamicStyleForAlbum = '';
-        if (template === 'eightiesMall') {
-            setIsSettingUp(true);
-            try {
-                dynamicStyleForAlbum = await generateDynamicPrompt("A specific, creative, and detailed style for an 80s mall portrait studio photoshoot.");
-                setCurrentAlbumStyle(dynamicStyleForAlbum);
-            } catch(e) {
-                setError("Could not generate a photoshoot style. Please try again.");
-                setIsLoading(false);
-                setIsSettingUp(false);
-                return;
-            }
-            setIsSettingUp(false);
-        } else {
-            setCurrentAlbumStyle(''); 
-        }
-
-        let promptsForGeneration = activeTemplate.prompts;
-        if (template === 'hairStyler') {
-            promptsForGeneration = activeTemplate.prompts.filter(p => selectedHairStyles.includes(p.id));
-            if (isCustomHairActive && customHairStyle.trim()) {
-                promptsForGeneration.push({ id: customHairStyle, base: customHairStyle });
-            }
-        }
-
-        setGeneratedImages(promptsForGeneration.map(p => ({ id: p.id, status: 'pending', imageUrl: null })));
-
-        for (let i = 0; i < promptsForGeneration.length; i++) {
-            const p = promptsForGeneration[i];
-            try {
-                const modelInstruction = getModelInstruction(template, p, { headshotExpression, headshotPose, currentAlbumStyle: dynamicStyleForAlbum, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText });
-                const imageUrl = await generateImageWithRetry(modelInstruction, imageWithoutPrefix);
-                const watermarkedImageUrl = await addWatermark(imageUrl);
-                setGeneratedImages(prev => prev.map((img, index) => index === i ? { ...img, status: 'success', imageUrl: watermarkedImageUrl } : img));
-            } catch (err) {
-                setGeneratedImages(prev => prev.map((img, index) => index === i ? { ...img, status: 'failed' } : img));
-                 if (err instanceof Error && err.message.includes('API key not valid')) {
-                    break; 
-                }
-            }
-        }
-        setIsLoading(false);
-    }, [uploadedImage, template, templates, lookbookStyle, customLookbookStyle, selectedHairStyles, isCustomHairActive, customHairStyle, hairColors, headshotExpression, headshotPose, celebrityName, keychainText, generationCount, generateDynamicPrompt, generateImageWithRetry]);
-
-    const triggerDownload = (href: string, fileName: string) => {
-        const link = document.createElement('a');
-        link.href = href;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    const handleDownloadRequest = async (imageUrl: string, era: string, ratio: string) => {
-        try {
-            const shouldAddLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration', 'celebrity', 'keychainCreator'].includes(template!);
-            const framedImageUrl = await createSingleFramedImage(imageUrl, ratio, shouldAddLabel ? era : null);
-            triggerDownload(framedImageUrl, `khiangtevillain-ai-${era.toLowerCase().replace(/\s+/g, '-')}.png`);
-        } catch (err) {
-            setError(`Could not prepare that image for download.`);
-        }
-    };
-    
-    const handleAlbumDownloadRequest = async () => {
-        if (isDownloadingAlbum) return;
-        setIsDownloadingAlbum(true);
-        setError(null);
-    
-        try {
-            const successfulImages = generatedImages.filter(img => img.status === 'success' && img.imageUrl);
-            if (successfulImages.length === 0) {
-                setError("No successful images to download.");
-                return;
-            }
-    
-            const zip = new JSZip();
-            
-            for (let i = 0; i < successfulImages.length; i++) {
-                const img = successfulImages[i];
-                const response = await fetch(img.imageUrl!);
-                const blob = await response.blob();
-                const fileName = `khiangtevillain-ai-${img.id.toLowerCase().replace(/\s+/g, '-')}-${i + 1}.png`;
-                zip.file(fileName, blob);
-            }
-    
-            const content = await zip.generateAsync({ type: "blob" });
-            const url = window.URL.createObjectURL(content);
-            triggerDownload(url, "khiangtevillain-ai-album.zip");
-            window.URL.revokeObjectURL(url);
-    
-        // Fix: Corrected syntax for catch block. The incorrect arrow function syntax was causing parsing errors.
-        } catch (err) {
-            console.error("Failed to create or download album:", err);
-            setError("Sorry, the album download failed.");
-        } finally {
-            setIsDownloadingAlbum(false);
-        }
-    };
-
-    const handleTemplateSelect = (templateId: string) => {
-        setTemplate(templateId);
-        setHeadshotExpression('Friendly Smile');
-        setHeadshotPose('Forward');
-        setLookbookStyle('');
-        setCustomLookbookStyle('');
-        setHairColors([]);
-        setSelectedHairStyles([]);
-        setCustomHairStyle('');
-        setIsCustomHairActive(false);
-        setCelebrityName('');
-        setKeychainText('');
-    };
-
-    const handleStartOver = () => {
-        setGeneratedImages([]);
-        setUploadedImage(null);
-        setError(null);
-        setTemplate(null);
-        handleTemplateSelect('');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const totalSelectedStyles = selectedHairStyles.length + (isCustomHairActive && customHairStyle.trim() ? 1 : 0);
-    const progress = generatedImages.length > 0 ? (generatedImages.filter(img => img.status !== 'pending').length / generatedImages.length) * 100 : 0;
-    
-    return (
-        <>
-           {!isUnlocked && 
-                <AccessModal 
-                    value={accessCodeInput}
-                    onChange={(e) => setAccessCodeInput(e.target.value)}
-                    onSubmit={handleUnlockAttempt}
-                    error={unlockError}
-                />
-            }
-            <div className={`transition-all duration-500 ${!isUnlocked ? 'filter blur-md pointer-events-none' : ''}`}>
-                <CameraModal isOpen={isCameraOpen} onClose={() => setIsCameraOpen(false)} onCapture={handleCaptureConfirm} />
-
-                <div className="bg-slate-950/0 text-gray-200 min-h-screen flex flex-col items-center p-4 pb-20 relative z-10">
-                    <ErrorNotification message={error} onDismiss={() => setError(null)} />
-                    
-                    <div className="w-full max-w-5xl mx-auto">
-                        <header className="text-center mt-12 mb-16 animate-fade-in-down">
-                            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter uppercase flex flex-col items-center">
-                                <span className="glitch-text" data-text="KHIANGTEVILLAIN AI IMAGES">
-                                    KHIANGTEVILLAIN AI IMAGES
-                                </span>
-                                <span className="text-pink-500 text-5xl md:text-6xl mt-1" style={{ textShadow: '0 0 5px #ec4899, 0 0 15px #ec4899, 0 0 30px #ec4899' }}>
-                                    GENERATOR
-                                </span>
-                            </h1>
-                            <p className="mt-4 text-lg text-slate-400">Nano-Banana Preview</p>
-                            <div className="flex justify-center gap-x-8 gap-y-4 mt-6 flex-wrap">
-                                <a href="https://www.instagram.com/khiangte.villain" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-pink-400 transition-colors font-medium">
-                                    <IconInstagram />
-                                    <span>@khiangte.villain</span>
-                                </a>
-                                <a href="https://www.youtube.com/@khiangtevillainAi" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-slate-400 hover:text-cyan-400 transition-colors font-medium">
-                                    <IconYouTube />
-                                    <span>@khiangtevillainAi</span>
-                                </a>
-                            </div>
-                        </header>
-
-                        <main>
-                            <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8">
-                                <div className="bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-cyan-400/20 animate-fade-in-up" style={{boxShadow: '0 0 40px rgba(56, 189, 248, 0.1)'}}>
-                                    <h2 className="text-xl font-semibold mb-4 text-cyan-300 uppercase tracking-widest">1. YOUR PHOTO</h2>
-                                    <div 
-                                      className="w-full aspect-square bg-slate-950/50 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 overflow-hidden relative border-2 border-cyan-400/30 shadow-[0_0_15px_rgba(56,189,248,0.15)] hover:border-cyan-400/70 hover:shadow-[0_0_25px_rgba(56,189,248,0.3)]" 
-                                      onClick={() => !uploadedImage && fileInputRef.current?.click()}
-                                    >
-                                        {isUploading ? <div className="flex flex-col items-center"><div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-pink-500"></div><p className="text-gray-400 mt-4">Uploading...</p></div> : uploadedImage ? <img src={uploadedImage} alt="Uploaded preview" className="w-full h-full object-contain" /> : <div className="flex flex-col items-center justify-center p-6 text-center text-cyan-400/70"><IconCameraOutline /><p className="mt-4 text-lg text-cyan-300">Click or drag a file</p><button onClick={(e) => { e.stopPropagation(); setIsCameraOpen(true); }} className="mt-4 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-slate-800/60 hover:bg-slate-700/80 transition-colors"><IconCamera />USE CAMERA</button></div>}
-                                    </div>
-                                    {uploadedImage && !isUploading && <div className="flex flex-col sm:flex-row gap-4 mt-4"><Button onClick={() => fileInputRef.current?.click()} className="flex-1">Change File</Button><Button onClick={() => setIsCameraOpen(true)} className="flex-1"><div className="flex items-center justify-center gap-2"><IconCamera /><span>Use Camera</span></div></Button></div>}
-                                    <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/png, image/jpeg" className="hidden" />
-
-                                    <div className="mt-6 text-center">
-                                         <CircuitGraphic>
-                                            <div className="text-sm text-cyan-300/80">
-                                                {generationCount > 0 ? (
-                                                    <p>Generations remaining today: <span className="font-bold text-cyan-300">{generationCount} / 3</span></p>
-                                                ) : (
-                                                    <p className="font-bold text-pink-400">No generations left today</p>
-                                                )}
-                                            </div>
-                                         </CircuitGraphic>
-
-                                        <button 
-                                            onClick={handleGenerateClick} 
-                                            disabled={!uploadedImage || !template || isLoading || isUploading || isSettingUp || generationCount <= 0} 
-                                            className="mt-6 w-full text-base font-bold tracking-wider uppercase rounded-lg p-3 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group relative overflow-hidden bg-pink-600 border border-pink-500 shadow-lg shadow-pink-500/30 hover:bg-pink-500"
-                                        >
-                                            <div className="relative flex items-center justify-center gap-2.5 text-white">
-                                                {isLoading || isSettingUp ? 
-                                                    <><div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>{isSettingUp ? "Setting up..." : `Generating...`}</> : 
-                                                generationCount <= 0 ? 
-                                                    <>Limit Reached</> : 
-                                                    <><IconSparkles /><span>GENERATE PHOTOS</span></>}
-                                            </div>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="bg-slate-900/50 backdrop-blur-sm p-6 md:p-8 rounded-2xl shadow-2xl border border-cyan-400/20 animate-fade-in-up styled-scrollbar overflow-y-auto" style={{boxShadow: '0 0 40px rgba(56, 189, 248, 0.1)', maxHeight: '720px'}}>
-                                    <h2 className="text-xl font-semibold mb-4 text-cyan-300 uppercase tracking-widest">2. CHOOSE THEME</h2>
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                        {Object.entries(templates).map(([key, data]) => <TemplateCard key={key} id={key} name={data.name} icon={data.icon} description={data.description} isSelected={template === key} onSelect={handleTemplateSelect} iconColor={data.iconColor} />)}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div ref={resultsRef}>
-                                {isSettingUp && <div className="text-center my-20 flex flex-col items-center p-10 bg-slate-900/70 rounded-2xl"><div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-pink-500 mb-6"></div><p className="text-2xl text-pink-400 font-semibold tracking-wider italic">Teasing our hair and firing up the lasers...</p><p className="text-slate-400 mt-2">Generating a totally tubular '80s photoshoot style!</p></div>}
-                                {(isLoading || generatedImages.length > 0) && !isSettingUp && (
-                                    <div className="mt-16">
-                                        <h2 className="text-3xl font-bold text-white mb-8 text-center font-orbitron">YOUR GENERATED PHOTOS</h2>
-                                        {isLoading && <div className="w-full max-w-4xl mx-auto mb-8 text-center"><div className="bg-slate-800 rounded-full h-3 overflow-hidden shadow-md"><div className="bg-gradient-to-r from-cyan-400 to-pink-500 h-3 rounded-full transition-all duration-500" style={{width: `${progress}%`}}></div></div><p className="text-slate-400 mt-4 text-sm">Please keep this window open while your photos are being generated.</p></div>}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
-                                            {generatedImages.map((img, index) => {
-                                                const isPolaroid = templates[template!]?.isPolaroid ?? false;
-                                                const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration', 'celebrity', 'keychainCreator'].includes(template!);
-                                                switch (img.status) {
-                                                    case 'success': return <PhotoDisplay key={`${img.id}-${index}-s`} era={img.id} imageUrl={img.imageUrl!} onDownload={handleDownloadRequest} onRegenerate={() => regenerateImageAtIndex(index)} isPolaroid={isPolaroid} index={index} showLabel={showLabel} />;
-                                                    case 'failed': return <ErrorCard key={`${img.id}-${index}-f`} era={img.id} isPolaroid={isPolaroid} onRegenerate={() => regenerateImageAtIndex(index)} showLabel={showLabel} />;
-                                                    default: return <LoadingCard key={`${img.id}-${index}-p`} era={img.id} isPolaroid={isPolaroid} showLabel={showLabel} />;
-                                                }
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
-                                {!isLoading && generatedImages.length > 0 && <div className="text-center mt-16 mb-12 flex flex-col sm:flex-row justify-center items-center gap-6"><Button onClick={handleStartOver}>Start Over</Button><Button onClick={handleAlbumDownloadRequest} primary disabled={isDownloadingAlbum}>{isDownloadingAlbum ? <div className="flex items-center gap-2"><div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div><span>Zipping...</span></div> : <div className="flex items-center gap-2"><IconDownload /><span>Download Album</span></div>}</Button></div>}
-                            </div>
-                        </main>
-                        <footer className="text-center mt-16 py-8 border-t border-slate-800 text-slate-500 text-sm animate-fade-in">
-                            <p>copyright khiangtevillain 2025</p>
-                            <p className="mt-1">Workspace by J&R business Aizawl, Mizoram</p>
-                        </footer>
-                    </div>
-                </div>
-            </div>
-        </>
-    );
-};
-
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
-
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+    const handleHairStyleSelect = (style
