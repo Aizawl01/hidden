@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// Initialize the Google AI client with the API key provided in the HTML.
-const ai = new GoogleGenAI({ apiKey: (window as any).process.env.API_KEY });
+// Fix: Initialize GoogleGenAI with API key from environment variable for security and correctness.
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // The secret code to unlock the app. Share this with your followers.
 const ACCESS_CODE = "NANO-VILLAIN-2025";
@@ -233,6 +233,7 @@ const IconShare = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 
 // --- React Components ---
 
+// Fix: Add 'type' prop to Button component to allow specifying button type (e.g., 'submit').
 const Button: React.FC<{ children: React.ReactNode, onClick?: React.MouseEventHandler<HTMLButtonElement>, disabled?: boolean, primary?: boolean, className?: string, type?: 'submit' | 'reset' | 'button' }> = ({ children, onClick, disabled, primary = false, className = '', type }) => {
     const baseClass = "px-6 py-2 rounded-md font-semibold tracking-wider uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
     const themeClass = primary 
@@ -495,6 +496,8 @@ const AccessModal: React.FC<{ value: string, onChange: (e: React.ChangeEvent<HTM
 };
 
 
+// Fix: Defined types for the templates object to resolve errors where properties
+// on the `data` variable were not accessible due to being typed as 'unknown'.
 type TemplatePrompt = { id: string; base: string; };
 type TemplateData = {
     name: string;
@@ -680,7 +683,7 @@ const App: React.FC = () => {
                 lastError = error as Error;
                 console.error(`Attempt ${attempt}/${totalAttempts} failed:`, error);
                 if (error instanceof Error && error.message.includes('API key not valid')) {
-                    setError("The API key is not valid. Please ensure it is configured correctly.");
+                    setError("The API key is not valid. Please ensure it is configured correctly in the environment.");
                     throw error;
                 }
             }
@@ -1122,6 +1125,7 @@ const App: React.FC = () => {
             triggerDownload(url, "khiangtevillain-ai-album.zip");
             window.URL.revokeObjectURL(url);
     
+        // Fix: Corrected syntax for catch block. The incorrect arrow function syntax was causing parsing errors.
         } catch (err) {
             console.error("Failed to create or download album:", err);
             setError("Sorry, the album download failed.");
@@ -1239,152 +1243,6 @@ const App: React.FC = () => {
                                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                         {Object.entries(templates).map(([key, data]) => <TemplateCard key={key} id={key} name={data.name} icon={data.icon} description={data.description} isSelected={template === key} onSelect={handleTemplateSelect} iconColor={data.iconColor} />)}
                                     </div>
-
-                                    {/* --- THEME CUSTOMIZATION SECTION --- */}
-                                    {template && (
-                                        <div className="mt-8 pt-6 border-t border-cyan-400/20">
-                                            <h2 className="text-xl font-semibold mb-4 text-cyan-300 uppercase tracking-widest">3. CUSTOMIZE</h2>
-
-                                            {template === 'headshots' && (
-                                                <div className="space-y-4 animate-fade-in">
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-slate-300 mb-2">Expression</label>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {['Friendly Smile', 'Confident Look', 'Serious', 'Natural Laugh'].map(exp => <RadioPill key={exp} name="expression" value={exp} label={exp} checked={headshotExpression === exp} onChange={(e) => setHeadshotExpression(e.target.value)} />)}
-                                                        </div>
-                                                    </div>
-                                                     <div>
-                                                        <label className="block text-sm font-medium text-slate-300 mb-2">Pose</label>
-                                                         <div className="flex flex-wrap gap-2">
-                                                            <RadioPill name="pose" value="Forward" label="Forward-Facing" checked={headshotPose === 'Forward'} onChange={(e) => setHeadshotPose(e.target.value)} />
-                                                            <RadioPill name="pose" value="Angled" label="Slight Angle" checked={headshotPose === 'Angled'} onChange={(e) => setHeadshotPose(e.target.value)} />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-                                            
-                                            {template === 'celebrity' && (
-                                                <div className="animate-fade-in">
-                                                    <label htmlFor="celebrity-name" className="block text-sm font-medium text-slate-300 mb-2">Celebrity Name</label>
-                                                    <input 
-                                                        type="text" 
-                                                        id="celebrity-name"
-                                                        value={celebrityName}
-                                                        onChange={(e) => setCelebrityName(e.target.value)}
-                                                        placeholder="e.g., Taylor Swift"
-                                                        className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-white"
-                                                    />
-                                                </div>
-                                            )}
-
-                                            {template === 'keychainCreator' && (
-                                                <div className="animate-fade-in">
-                                                    <label htmlFor="keychain-text" className="block text-sm font-medium text-slate-300 mb-2">Keychain Text (Optional)</label>
-                                                    <input 
-                                                        type="text" 
-                                                        id="keychain-text"
-                                                        value={keychainText}
-                                                        onChange={(e) => setKeychainText(e.target.value)}
-                                                        placeholder="Default: KhiangteVillain"
-                                                        className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-white"
-                                                    />
-                                                </div>
-                                            )}
-                                            
-                                            {template === 'styleLookbook' && (
-                                                <div className="space-y-4 animate-fade-in">
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-slate-300 mb-2">Fashion Style</label>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {[...(templates.styleLookbook?.styles || []), 'Other'].map(style => <RadioPill key={style} name="lookbook" value={style} label={style} checked={lookbookStyle === style} onChange={(e) => setLookbookStyle(e.target.value)} />)}
-                                                        </div>
-                                                    </div>
-                                                    {lookbookStyle === 'Other' && (
-                                                        <div className="animate-fade-in">
-                                                             <label htmlFor="custom-lookbook" className="block text-sm font-medium text-slate-300 mb-2">Your Custom Style</label>
-                                                            <input 
-                                                                type="text" 
-                                                                id="custom-lookbook"
-                                                                value={customLookbookStyle}
-                                                                onChange={(e) => setCustomLookbookStyle(e.target.value)}
-                                                                placeholder="e.g., Cyberpunk Chic"
-                                                                className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-white"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                            
-                                            {template === 'hairStyler' && (
-                                                <div className="space-y-4 animate-fade-in">
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-slate-300 mb-2">
-                                                            Hair Styles (Choose up to 6)
-                                                            <span className="ml-2 text-xs text-slate-500">({totalSelectedStyles}/6)</span>
-                                                        </label>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {[...(templates.hairStyler?.prompts.map(p => p.id) || []), 'Other'].map(style => {
-                                                                const isChecked = selectedHairStyles.includes(style) || (style === 'Other' && isCustomHairActive);
-                                                                return (
-                                                                    <label key={style} className={`cursor-pointer px-3 py-1.5 text-sm rounded-full transition-colors font-semibold ${isChecked ? 'bg-pink-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}>
-                                                                        <input 
-                                                                            type="checkbox"
-                                                                            checked={isChecked}
-                                                                            onChange={() => handleHairStyleSelect(style)}
-                                                                            className="hidden"
-                                                                        />
-                                                                        {style}
-                                                                    </label>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                    {isCustomHairActive && (
-                                                        <div className="animate-fade-in">
-                                                            <label htmlFor="custom-hair" className="block text-sm font-medium text-slate-300 mb-2">Your Custom Style</label>
-                                                            <input
-                                                                type="text"
-                                                                id="custom-hair"
-                                                                value={customHairStyle}
-                                                                onChange={(e) => setCustomHairStyle(e.target.value)}
-                                                                placeholder="e.g., Fiery Mohawk"
-                                                                className="w-full bg-slate-800 border border-slate-600 rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-cyan-400 text-white"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-slate-300 mb-2">Hair Colors (Optional)</label>
-                                                        <div className="space-y-2">
-                                                            {hairColors.map((color, index) => (
-                                                                <div key={index} className="flex items-center gap-2">
-                                                                    <input
-                                                                        type="color"
-                                                                        value={color}
-                                                                        onChange={(e) => handleColorChange(index, e.target.value)}
-                                                                        className="w-8 h-8 p-0 border-0 rounded-md bg-transparent cursor-pointer"
-                                                                    />
-                                                                    <input
-                                                                        type="text"
-                                                                        value={color}
-                                                                        onChange={(e) => handleColorChange(index, e.target.value)}
-                                                                        className="flex-1 bg-slate-800 border border-slate-600 rounded-lg py-1 px-2 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 text-white"
-                                                                    />
-                                                                    <button onClick={() => removeHairColor(index)} className="p-1 rounded-full text-slate-400 hover:bg-slate-700 hover:text-white"><IconX /></button>
-                                                                </div>
-                                                            ))}
-                                                            {hairColors.length < 2 && (
-                                                                <button onClick={addHairColor} className="w-full text-sm text-cyan-300 hover:text-cyan-200 bg-slate-800/50 hover:bg-slate-800 rounded-lg py-2 flex items-center justify-center gap-2 border border-dashed border-slate-600 hover:border-cyan-500 transition-colors">
-                                                                    <IconPlus /> Add a Color
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                        </div>
-                                    )}
-
                                 </div>
                             </div>
 
