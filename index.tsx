@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
@@ -190,11 +191,6 @@ const getModelInstruction = (template: string, prompt: { id: string; base: strin
             const textLabel = keychainText && keychainText.trim() !== '' ? keychainText.trim() : "KhiangteVillain";
             return `${baseInstruction} Create a 9:16 ultra-realistic product photograph with soft studio lighting and glossy highlights. The photo should feature a realistic action figure keychain of the person from the uploaded image, designed with lifelike details and natural proportions. The figure must have a soft, cheerful expression, a realistic face sculpt, and a premium collectible look. The keychain strap should be a bright color that complements the character's clothing and feature extra bold white text that reads "${textLabel}". A realistic human hand should be holding the keychain ring, with fingers gently pinching it, captured sharply in focus. The background must be softly blurred with inside shop of the key chain interior lighting, cinematic bokeh, and a professional product showcase aesthetic.`;
         }
-        case 'y2kCybercore':
-        case 'animeManga':
-        case 'videoGameAvatars':
-        case 'stickerPack':
-            return `${baseInstruction} Transform the person to fit the following scene: ${prompt.base}.`;
         default:
             return `Create an image based on the reference photo and this prompt: ${prompt.base}`;
     }
@@ -214,10 +210,6 @@ const Icon80s = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8
 const IconHair = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.9 0 3.6.8 4.9 2.1l-1.4 1.4c-.9-.9-2.2-1.5-3.5-1.5s-2.6.6-3.5 1.5L7.1 4.1C8.4 2.8 10.1 2 12 2zm8.9 7.1c-1.7-1.7-4-2.1-6.2-1.1l-3.4-3.4c-2.2-1-4.5-.6-6.2 1.1l3.4 3.4c-2.2 1-2.6 3.3-1.1 5.1.7.8 1.6 1.3 2.6 1.5l4.3-4.3c1.9 0 3.6-.8 4.9-2.1l1.4 1.4C19.2 13.4 21 12.7 22 11c0-1.9-.8-3.6-2.1-4.9zM2 12c0-1.5.8-2.8 2.1-3.5L2.7 7.1C1 8.4 0 10.1 0 12s1 3.6 2.7 4.9l1.4-1.4C3.2 14.8 2 13.5 2 12zm17.9 2.9c1.6-1.7 1.2-4.1-1.1-5.1l-3.4 3.4c1.6 1.7 1.2 4.1-1.1 5.1l-4.3 4.3c1.9 0 3.6-.8 4.9-2.1l1.4 1.4C19.2 20.6 21 19.9 22 18c0-1.9-.8-3.6-2.1-4.9z"/></svg>;
 const IconImpossible = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M15 11.26V9.45c0-1.72-1.28-3.1-2.96-3.19C10.37 6.17 9 7.42 9 9v2.26C6.17 11.83 4 14.61 4 18h16c0-3.39-2.17-6.17-5-6.74zM12 20c-1.1 0-2-.9-2-2h4c0 1.1-.9 2-2 2zM13.2 5.09c.45-.37.79-.83.99-1.34l.2-1.3C14.48 1.7 13.82 1 13.06 1H11c-.75 0-1.41.69-1.2 1.45l.2 1.3c.2.51.55.97 1 1.34C9.17 6.17 8 8.42 8 11h8c0-2.58-1.17-4.83-3.2-5.91z"/></svg>;
 const IconHeadshot = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>;
-const IconY2K = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0L9.91 8.09 2 10l7.91 1.91L12 20l2.09-7.91L22 10l-7.91-1.91L12 0z"/></svg>;
-const IconAnime = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5C21.27 7.61 17 4.5 12 4.5zm0 10c-2.48 0-4.5-2.02-4.5-4.5S9.52 5.5 12 5.5 16.5 7.52 16.5 10 14.48 14.5 12 14.5zm0-7C10.62 7.5 9.5 8.62 9.5 10s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5S13.38 7.5 12 7.5z"/></svg>;
-const IconVideoGame = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 9H8v-3H5v-2h3V7h3v3h2v2h-2v3zm4.5 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>;
-const IconSticker = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-6c.78 2.34 2.72 4 5 4s4.22-1.66 5-4H7zM9 12c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm6 0c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>;
 
 const IconSparkles = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" /></svg>;
 const IconOptions = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" /></svg>;
@@ -225,10 +217,9 @@ const IconDownload = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" v
 const IconCamera = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-2"><path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.776 48.776 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z" /></svg>;
 const IconPlus = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>;
 const IconX = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>;
-const IconInstagram = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664 4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.802C9.042 3.965 8.72 3.978 7.474 4.034c-2.43.111-3.64 1.317-3.75 3.75-.056 1.246-.068 1.568-.068 4.216s.012 2.97.068 4.216c.11 2.43 1.317 3.64 3.75 3.75 1.246.056 1.568.068 4.216.068s2.97-.012 4.216-.068c2.43-.11 3.64-1.317 3.75-3.75.056-1.246.068-1.568-.068-4.216s-.012-2.97-.068-4.216c-.11-2.43-1.317-3.64-3.75-3.75-1.246-.056-1.568-.068-4.216-.068zm0 5.438c-2.273 0-4.106 1.833-4.106 4.106s1.833 4.106 4.106 4.106 4.106-1.833 4.106-4.106-1.833-4.106-4.106-4.106zm0 6.55c-1.348 0-2.444-1.096-2.444-2.444s1.096-2.444 2.444-2.444 2.444 1.096 2.444 2.444-1.096 2.444-2.444-2.444zM16.949 6.05a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"></path></svg>;
+const IconInstagram = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664 4.771 4.919-4.919C8.416 2.175 8.796 2.163 12 2.163zm0 1.802C9.042 3.965 8.72 3.978 7.474 4.034c-2.43.111-3.64 1.317-3.75 3.75-.056 1.246-.068 1.568-.068 4.216s.012 2.97.068 4.216c.11 2.43 1.317 3.64 3.75 3.75 1.246.056 1.568.068 4.216.068s2.97-.012 4.216-.068c2.43-.11 3.64-1.317 3.75-3.75.056-1.246.068-1.568-.068-4.216s-.012-2.97-.068-4.216c-.11-2.43-1.317-3.64-3.75-3.75-1.246-.056-1.568-.068-4.216-.068zm0 5.438c-2.273 0-4.106 1.833-4.106 4.106s1.833 4.106 4.106 4.106 4.106-1.833 4.106-4.106-1.833-4.106-4.106-4.106zm0 6.55c-1.348 0-2.444-1.096-2.444-2.444s1.096-2.444 2.444-2.444 2.444 1.096 2.444 2.444-1.096 2.444-2.444 2.444zM16.949 6.05a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"></path></svg>;
 const IconYouTube = () => <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"></path></svg>;
 const IconLock = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5"><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>;
-const IconShare = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 mr-3"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.186 2.25 2.25 0 0 0-3.933 2.186Z" /></svg>;
 
 
 // --- React Components ---
@@ -243,7 +234,7 @@ const Button: React.FC<{ children: React.ReactNode, onClick?: React.MouseEventHa
     return <button type={type} onClick={onClick} disabled={disabled} className={`${baseClass} ${themeClass} ${className}`}>{children}</button>;
 };
 
-const PhotoDisplay: React.FC<{ era: string, imageUrl: string, onDownload: (url: string, era: string, ratio: string) => void, onRegenerate: () => void, onShare: () => void, isPolaroid?: boolean, index?: number, showLabel?: boolean }> = ({ era, imageUrl, onDownload, onRegenerate, onShare, isPolaroid = true, index=0, showLabel = true }) => {
+const PhotoDisplay: React.FC<{ era: string, imageUrl: string, onDownload: (url: string, era: string, ratio: string) => void, onRegenerate: () => void, isPolaroid?: boolean, index?: number, showLabel?: boolean }> = ({ era, imageUrl, onDownload, onRegenerate, isPolaroid = true, index=0, showLabel = true }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -278,10 +269,6 @@ const PhotoDisplay: React.FC<{ era: string, imageUrl: string, onDownload: (url: 
                     <div className="absolute right-0 top-12 mt-2 w-48 origin-top-right bg-black/80 backdrop-blur-md rounded-lg shadow-2xl ring-1 ring-white/10 text-white text-sm flex flex-col p-1 animate-fade-in">
                         <span className="w-full text-left px-3 pt-2 pb-1 text-xs text-gray-500 uppercase tracking-wider">Actions</span>
                         <button onClick={() => { onRegenerate(); setIsMenuOpen(false); }} className="w-full text-left px-3 py-2 hover:bg-pink-500/20 rounded-md transition-colors">Regenerate</button>
-                        <button onClick={() => { onShare(); setIsMenuOpen(false); }} className="w-full text-left px-3 py-2 hover:bg-pink-500/20 rounded-md transition-colors flex items-center">
-                            <IconShare />
-                            <span>Share</span>
-                        </button>
                         <div className="my-1 h-px bg-white/10"></div>
                         <span className="w-full text-left px-3 pt-1 pb-1 text-xs text-gray-500 uppercase tracking-wider">Download</span>
                         <button onClick={() => { onDownload(imageUrl, era, '1:1'); setIsMenuOpen(false); }} className="w-full text-left px-3 py-2 hover:bg-pink-500/20 rounded-md transition-colors">Square (1:1)</button>
@@ -683,7 +670,7 @@ const App: React.FC = () => {
                 lastError = error as Error;
                 console.error(`Attempt ${attempt}/${totalAttempts} failed:`, error);
                 if (error instanceof Error && error.message.includes('API key not valid')) {
-                    setError("The API key is not valid. Please ensure it is configured correctly in the environment.");
+                    setError("The hardcoded API Key is not valid. Please update it in the code.");
                     throw error;
                 }
             }
@@ -778,54 +765,6 @@ const App: React.FC = () => {
                 { id: 'Vinyl Figure', base: 'A stylized collectible vinyl art toy of the person with minimalist features, standing on a shelf filled with other similar toys.' },
                 { id: 'Plushy Figure', base: 'A soft, cute plushy figure of the person with detailed fabric texture and stitching, sitting on a neatly made bed.' },
                 { id: 'Bobblehead', base: 'A realistic bobblehead figure of the person with an oversized head, displayed on a polished wooden desk next to a computer keyboard.' },
-            ]
-        },
-        y2kCybercore: {
-            name: 'Y2K Cybercore',
-            description: 'Futuristic, glossy looks from the year 2000.',
-            icon: <IconY2K />,
-            iconColor: 'text-cyan-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Music Video Star', base: 'as a pop star in a Y2K music video, with glossy lips, chrome clothing, and a background of abstract digital graphics.' },
-                { id: 'Cyber Runner', base: 'as a cyberpunk character in a neon-lit, rainy city street, with subtle glowing tech implants on their face.' },
-                { id: 'Holographic Glitch', base: 'as a glitching holographic projection with digital artifacts and a futuristic interface overlay.' },
-            ]
-        },
-        animeManga: {
-            name: 'Anime & Manga Styles',
-            description: 'Reimagine yourself in various anime art styles.',
-            icon: <IconAnime />,
-            iconColor: 'text-rose-400',
-            isPolaroid: false,
-            prompts: [
-                { id: "'90s Anime", base: "as a character in a '90s-style anime, with soft, nostalgic colors, film grain, and a dreamy city-pop background." },
-                { id: 'Modern Shonen', base: 'as the hero of a modern action manga, with dynamic, sharp lines, intense eyes, and an explosive energy aura.' },
-                { id: 'Ghibli-esque', base: 'as a character in a whimsical, Ghibli-inspired scene, with a hand-painted storybook background and a gentle, heartwarming expression.' },
-            ]
-        },
-        videoGameAvatars: {
-            name: 'Video Game Avatars',
-            description: 'Become a character from different gaming eras.',
-            icon: <IconVideoGame />,
-            iconColor: 'text-green-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Pixel Art', base: 'as a 16-bit RPG character sprite, with pixel-perfect details, ready for an adventure.' },
-                { id: 'AAA Concept Art', base: 'as a realistic character in the concept art for a modern AAA game, with detailed armor and a dramatic, cinematic background.' },
-                { id: 'Low-Poly PS1', base: 'as a character from a classic PlayStation 1 game, with nostalgic, low-poly 3D graphics and sharp, geometric features.' },
-            ]
-        },
-        stickerPack: {
-            name: 'Expressive Stickers',
-            description: 'Generate a pack of custom reaction stickers.',
-            icon: <IconSticker />,
-            iconColor: 'text-yellow-400',
-            isPolaroid: false,
-            prompts: [
-                { id: 'Laughing', base: 'A vibrant, cartoonish sticker of the person laughing, with bold outlines and a transparent background.' },
-                { id: 'Crying', base: "A cute, anime-style 'chibi' sticker of the person crying dramatically with big, teary eyes, with a transparent background." },
-                { id: 'Mind-Blown', base: "An expressive sticker of the person's mind being blown, with an exploding head and vibrant colors, with a transparent background." },
             ]
         },
         keychainCreator: {
@@ -1067,36 +1006,6 @@ const App: React.FC = () => {
             setError(`Could not prepare that image for download.`);
         }
     };
-
-    const handleShareRequest = async (imageUrl: string, era: string) => {
-        if (!navigator.share) {
-            setError("Sharing is not supported on your browser.");
-            return;
-        }
-    
-        try {
-            const response = await fetch(imageUrl);
-            const blob = await response.blob();
-            const file = new File([blob], `khiangtevillain-ai-${era.toLowerCase().replace(/\s+/g, '-')}.png`, { type: blob.type });
-    
-            // @ts-ignore
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                await navigator.share({
-                    files: [file],
-                    title: `My AI Photo: ${era}`,
-                    text: "Check out this AI image I created with Khiangtevillain's AI Image Generator! #AIart #Gemini #Khiangtevillain",
-                    url: window.location.href
-                });
-            } else {
-                 setError("Your browser cannot share this type of file.");
-            }
-        } catch (error) {
-            if (error instanceof Error && error.name !== 'AbortError') {
-                console.error("Sharing failed:", error);
-                setError("Something went wrong while trying to share.");
-            }
-        }
-    };
     
     const handleAlbumDownloadRequest = async () => {
         if (isDownloadingAlbum) return;
@@ -1255,9 +1164,9 @@ const App: React.FC = () => {
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
                                             {generatedImages.map((img, index) => {
                                                 const isPolaroid = templates[template!]?.isPolaroid ?? false;
-                                                const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration', 'celebrity', 'keychainCreator', 'y2kCybercore', 'animeManga', 'videoGameAvatars', 'stickerPack'].includes(template!);
+                                                const showLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration', 'celebrity', 'keychainCreator'].includes(template!);
                                                 switch (img.status) {
-                                                    case 'success': return <PhotoDisplay key={`${img.id}-${index}-s`} era={img.id} imageUrl={img.imageUrl!} onDownload={handleDownloadRequest} onRegenerate={() => regenerateImageAtIndex(index)} onShare={() => handleShareRequest(img.imageUrl!, img.id)} isPolaroid={isPolaroid} index={index} showLabel={showLabel} />;
+                                                    case 'success': return <PhotoDisplay key={`${img.id}-${index}-s`} era={img.id} imageUrl={img.imageUrl!} onDownload={handleDownloadRequest} onRegenerate={() => regenerateImageAtIndex(index)} isPolaroid={isPolaroid} index={index} showLabel={showLabel} />;
                                                     case 'failed': return <ErrorCard key={`${img.id}-${index}-f`} era={img.id} isPolaroid={isPolaroid} onRegenerate={() => regenerateImageAtIndex(index)} showLabel={showLabel} />;
                                                     default: return <LoadingCard key={`${img.id}-${index}-p`} era={img.id} isPolaroid={isPolaroid} showLabel={showLabel} />;
                                                 }
