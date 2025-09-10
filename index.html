@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>khiangtevillain ai image generator beta</title>
+    <link rel="icon" href="favicon.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Added Babel to transpile JSX/TSX in the browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -48,7 +49,7 @@
        .styled-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
        .styled-scrollbar::-webkit-scrollbar-thumb:hover { background: #ec4899; }
 
-        /* Glitch Text Effect */
+        /* Glitch Text Effect (Inspired by codepen.io/nodws/pen/WNjXbr) */
         .glitch-text {
             position: relative;
             color: white;
@@ -65,87 +66,96 @@
             height: 100%;
             background: #020617;
             overflow: hidden;
-            clip: rect(0, 0, 0, 0);
         }
 
         .glitch-text::before {
-            left: -1px;
-            text-shadow: 1px 0 #ff00c1;
-            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+            left: 2px;
+            text-shadow: -2px 0 #ff00c1;
+            animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
         }
 
         .glitch-text::after {
-            left: 1px;
-            text-shadow: -1px 0 #00fff9;
-            animation: glitch-anim-2 2s infinite linear alternate-reverse;
+            left: -2px;
+            text-shadow: -2px 0 #00fff9;
+            animation: glitch-anim-2 3.5s infinite linear alternate-reverse;
         }
 
         @keyframes glitch-anim-1 {
-            0% { clip: rect(42px, 9999px, 44px, 0); }
-            5% { clip: rect(12px, 9999px, 60px, 0); }
-            10% { clip: rect(40px, 9999px, 45px, 0); }
-            15% { clip: rect(27px, 9999px, 55px, 0); }
-            20% { clip: rect(13px, 9999px, 35px, 0); }
-            25% { clip: rect(38px, 9999px, 53px, 0); }
-            30% { clip: rect(25px, 9999px, 60px, 0); }
-            35% { clip: rect(14px, 9999px, 41px, 0); }
-            40% { clip: rect(30px, 9999px, 65px, 0); }
-            45% { clip: rect(5px, 9999px, 42px, 0); }
-            50% { clip: rect(22px, 9999px, 69px, 0); }
-            55% { clip: rect(45px, 9999px, 59px, 0); }
-            60% { clip: rect(35px, 9999px, 70px, 0); }
-            65% { clip: rect(18px, 9999px, 48px, 0); }
-            70% { clip: rect(48px, 9999px, 58px, 0); }
-            75% { clip: rect(28px, 9999px, 68px, 0); }
-            80% { clip: rect(10px, 9999px, 50px, 0); }
-            85% { clip: rect(50px, 9999px, 60px, 0); }
-            90% { clip: rect(20px, 9999px, 70px, 0); }
-            95% { clip: rect(55px, 9999px, 65px, 0); }
-            100% { clip: rect(32px, 9999px, 72px, 0); }
+          0% { clip-path: inset(42% 0 55% 0); }
+          5% { clip-path: inset(15% 0 75% 0); }
+          10% { clip-path: inset(82% 0 15% 0); }
+          15% { clip-path: inset(25% 0 5% 0); }
+          20% { clip-path: inset(45% 0 45% 0); }
+          25% { clip-path: inset(12% 0 85% 0); }
+          30% { clip-path: inset(65% 0 10% 0); }
+          35% { clip-path: inset(2% 0 95% 0); }
+          40% { clip-path: inset(75% 0 22% 0); }
+          45% { clip-path: inset(90% 0 1% 0); }
+          50% { clip-path: inset(2% 0 75% 0); }
+          55% { clip-path: inset(55% 0 32% 0); }
+          60% { clip-path: inset(10% 0 82% 0); }
+          65% { clip-path: inset(80% 0 5% 0); }
+          70% { clip-path: inset(22% 0 72% 0); }
+          75% { clip-path: inset(40% 0 33% 0); }
+          80% { clip-path: inset(1% 0 90% 0); }
+          85% { clip-path: inset(60% 0 30% 0); }
+          90% { clip-path: inset(30% 0 62% 0); }
+          95% { clip-path: inset(88% 0 2% 0); }
+          100% { clip-path: inset(10% 0 70% 0); }
         }
 
         @keyframes glitch-anim-2 {
-            0% { clip: rect(85px, 9999px, 90px, 0); }
-            5% { clip: rect(65px, 9999px, 80px, 0); }
-            10% { clip: rect(5px, 9999px, 20px, 0); }
-            15% { clip: rect(75px, 9999px, 95px, 0); }
-            20% { clip: rect(25px, 9999px, 40px, 0); }
-            25% { clip: rect(80px, 9999px, 99px, 0); }
-            30% { clip: rect(15px, 9999px, 30px, 0); }
-            35% { clip: rect(90px, 9999px, 100px, 0); }
-            40% { clip: rect(45px, 9999px, 60px, 0); }
-            45% { clip: rect(10px, 9999px, 25px, 0); }
-            50% { clip: rect(70px, 9999px, 85px, 0); }
-            55% { clip: rect(30px, 9999px, 45px, 0); }
-            60% { clip: rect(82px, 9999px, 97px, 0); }
-            65% { clip: rect(22px, 9999px, 37px, 0); }
-            70% { clip: rect(58px, 9999px, 73px, 0); }
-            75% { clip: rect(38px, 9999px, 53px, 0); }
-            80% { clip: rect(78px, 9999px, 93px, 0); }
-            85% { clip: rect(18px, 9999px, 33px, 0); }
-            90% { clip: rect(52px, 9999px, 67px, 0); }
-            95% { clip: rect(42px, 9999px, 57px, 0); }
-            100% { clip: rect(2px, 9999px, 17px, 0); }
+          0% { clip-path: inset(98% 0 2% 0); }
+          5% { clip-path: inset(40% 0 35% 0); }
+          10% { clip-path: inset(20% 0 70% 0); }
+          15% { clip-path: inset(85% 0 5% 0); }
+          20% { clip-path: inset(5% 0 88% 0); }
+          25% { clip-path: inset(50% 0 25% 0); }
+          30% { clip-path: inset(2% 0 95% 0); }
+          35% { clip-path: inset(75% 0 10% 0); }
+          40% { clip-path: inset(58% 0 40% 0); }
+          45% { clip-path: inset(12% 0 80% 0); }
+          50% { clip-path: inset(90% 0 2% 0); }
+          55% { clip-path: inset(30% 0 55% 0); }
+          60% { clip-path: inset(15% 0 82% 0); }
+          65% { clip-path: inset(70% 0 20% 0); }
+          70% { clip-path: inset(45% 0 50% 0); }
+          75% { clip-path: inset(95% 0 2% 0); }
+          80% { clip-path: inset(10% 0 78% 0); }
+          85% { clip-path: inset(40% 0 30% 0); }
+          90% { clip-path: inset(22% 0 75% 0); }
+          95% { clip-path: inset(78% 0 10% 0); }
+          100% { clip-path: inset(45% 0 48% 0); }
         }
     </style>
+    <!-- Injects the API key into a mock process.env object for the browser -->
+    <script>
+      window.process = {
+        env: {
+          API_KEY: "AIzaSyC4hkmqihimopHTQBZ8sZa-zbq6ZtRnnms"
+        }
+      };
+    </script>
   <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@19.1.1",
-    "react-dom/client": "https://esm.sh/react-dom@19.1.1/client",
-    "@google/genai": "https://esm.sh/@google/genai@latest",
-    "react/": "https://esm.sh/react@19.1.1/",
-    "react-dom/": "https://esm.sh/react-dom@19.1.1/"
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.1.1/client",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/"
   }
 }
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-  <body class="bg-slate-950">
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
     <canvas id="background-canvas"></canvas>
     <div id="root"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script type="text/babel" data-presets="typescript,react" data-type="module" src="./index.tsx"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <!-- Use type="text/babel" to let Babel transpile the script -->
+    <script type="text/babel" data-type="module" src="./index.tsx"></script>
   <script type="module" src="/index.tsx"></script>
 </body>
 </html>
