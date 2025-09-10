@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// Fix: Initialize GoogleGenAI with API key from environment variable for security and correctness.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize the Google AI client with the API key provided in the HTML.
+const ai = new GoogleGenAI({ apiKey: (window as any).process.env.API_KEY });
 
 // The secret code to unlock the app. Share this with your followers.
 const ACCESS_CODE = "NANO-VILLAIN-2025";
@@ -233,7 +233,6 @@ const IconShare = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" view
 
 // --- React Components ---
 
-// Fix: Add 'type' prop to Button component to allow specifying button type (e.g., 'submit').
 const Button: React.FC<{ children: React.ReactNode, onClick?: React.MouseEventHandler<HTMLButtonElement>, disabled?: boolean, primary?: boolean, className?: string, type?: 'submit' | 'reset' | 'button' }> = ({ children, onClick, disabled, primary = false, className = '', type }) => {
     const baseClass = "px-6 py-2 rounded-md font-semibold tracking-wider uppercase transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed";
     const themeClass = primary 
@@ -496,8 +495,6 @@ const AccessModal: React.FC<{ value: string, onChange: (e: React.ChangeEvent<HTM
 };
 
 
-// Fix: Defined types for the templates object to resolve errors where properties
-// on the `data` variable were not accessible due to being typed as 'unknown'.
 type TemplatePrompt = { id: string; base: string; };
 type TemplateData = {
     name: string;
@@ -1125,7 +1122,6 @@ const App: React.FC = () => {
             triggerDownload(url, "khiangtevillain-ai-album.zip");
             window.URL.revokeObjectURL(url);
     
-        // Fix: Corrected syntax for catch block. The incorrect arrow function syntax was causing parsing errors.
         } catch (err) {
             console.error("Failed to create or download album:", err);
             setError("Sorry, the album download failed.");
