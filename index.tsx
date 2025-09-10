@@ -1,15 +1,13 @@
+
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// Initialize the Google AI client with the API key from environment variables.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize the Google AI client with the API key provided in the HTML.
+const ai = new GoogleGenAI({ apiKey: (window as any).process.env.API_KEY });
 
 // The secret code to unlock the app. Share this with your followers.
 const ACCESS_CODE = "NANO-VILLAIN-2025";
-
-
-declare const JSZip: any;
 
 // --- Helper Functions (don't require AI instance) ---
 
@@ -913,42 +911,23 @@ const App: React.FC = () => {
 
     const regenerateImageAtIndex = useCallback(async (imageIndex: number) => {
         if (!generatedImages[imageIndex]) return;
-
-        const imageToRegenerate = generatedImages[imageIndex];
-        const originalPromptId = imageToRegenerate.id;
-
         setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'pending' } : img));
         setError(null);
-
-        let prompt: TemplatePrompt | undefined;
-        let originalTemplateId: string | undefined;
-
-        // Find the prompt and its original template by searching all templates.
-        // This fixes a bug where regenerating would fail if you switched themes.
-        for (const key in templates) {
-            const p = templates[key].prompts.find(p => p.id === originalPromptId);
-            if (p) {
-                prompt = p;
-                originalTemplateId = key;
-                break;
-            }
-        }
-
-        // Handle custom hair styler prompts that are not in the predefined lists.
-        if (!prompt && originalPromptId) {
-            prompt = { id: originalPromptId, base: originalPromptId };
-            originalTemplateId = 'hairStyler';
-        }
-
-        if (!prompt || !originalTemplateId) {
-            setError("Could not find the original prompt to regenerate.");
+    
+        const activeTemplate = templates[template!];
+        let promptsForGeneration = template === 'hairStyler' ? activeTemplate.prompts.filter(p => selectedHairStyles.includes(p.id)) : activeTemplate.prompts;
+        if (template === 'hairStyler' && isCustomHairActive && customHairStyle.trim()) promptsForGeneration.push({ id: customHairStyle, base: customHairStyle });
+    
+        const prompt = promptsForGeneration[imageIndex];
+        if (!prompt) {
+            setError("Could not find the prompt to regenerate.");
             setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'failed' } : img));
             return;
         }
-
+    
         try {
             if (!uploadedImage) throw new Error("No uploaded image found for regeneration.");
-            const modelInstruction = getModelInstruction(originalTemplateId, prompt, { headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText });
+            const modelInstruction = getModelInstruction(template!, prompt, { headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText });
             const imageUrl = await generateImageWithRetry(modelInstruction, uploadedImage.split(',')[1]);
             const watermarkedImageUrl = await addWatermark(imageUrl);
             setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'success', imageUrl: watermarkedImageUrl } : img));
@@ -956,7 +935,7 @@ const App: React.FC = () => {
             setError(`Oops! Regeneration for "${prompt.id}" failed. Please try again.`);
             setGeneratedImages(prev => prev.map((img, i) => i === imageIndex ? { ...img, status: 'failed' } : img));
         }
-    }, [generatedImages, uploadedImage, templates, headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText, generateImageWithRetry]);
+    }, [generatedImages, template, uploadedImage, templates, selectedHairStyles, isCustomHairActive, customHairStyle, headshotExpression, headshotPose, currentAlbumStyle, lookbookStyle, customLookbookStyle, hairColors, celebrityName, keychainText, generateImageWithRetry]);
     
     const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -1126,7 +1105,7 @@ const App: React.FC = () => {
                 return;
             }
     
-            const zip = new JSZip();
+            const zip = new (window as any).JSZip();
             
             for (let i = 0; i < successfulImages.length; i++) {
                 const img = successfulImages[i];

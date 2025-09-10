@@ -128,14 +128,6 @@
           100% { clip-path: inset(45% 0 48% 0); }
         }
     </style>
-    <!-- Injects the API key into a mock process.env object for the browser -->
-    <script>
-      window.process = {
-        env: {
-          API_KEY: "AIzaSyC4hkmqihimopHTQBZ8sZa-zbq6ZtRnnms"
-        }
-      };
-    </script>
   <script type="importmap">
 {
   "imports": {
@@ -154,6 +146,17 @@
     <canvas id="background-canvas"></canvas>
     <div id="root"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <script>
+        // WARNING: This is NOT a secure way to handle API keys in a real application.
+        // This key is visible to anyone who visits the website. For a production app,
+        // you should use a server-side proxy to keep your API key secret.
+        // The API key below has been set with the one provided by the user.
+        window.process = {
+            env: {
+                API_KEY: "AIzaSyC4hkmqihimopHTQBZ8sZa-zbq6ZtRnnms"
+            }
+        };
+    </script>
     <!-- Use type="text/babel" to let Babel transpile the script -->
     <script type="text/babel" data-type="module" src="./index.tsx"></script>
   <script type="module" src="/index.tsx"></script>
