@@ -1,16 +1,11 @@
-
-
-
-
-
-
-
-
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// FIX: The API key must be obtained from `process.env.API_KEY` as per the coding guidelines.
+// Fix: Declare JSZip to inform TypeScript about the global variable from an external script.
+declare var JSZip: any;
+
+// Fix: Property 'GEMINI_API_KEY' does not exist on type 'Window & typeof globalThis'. Initialize with `process.env.API_KEY` as per guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // The secret code to unlock the app. Share this with your followers.
@@ -1112,7 +1107,8 @@ const App: React.FC = () => {
                 return;
             }
     
-            const zip = new (window as any).JSZip();
+            // Fix: Property 'JSZip' does not exist on type 'Window & typeof globalThis'. Use JSZip directly as it's declared globally.
+            const zip = new JSZip();
             
             for (let i = 0; i < successfulImages.length; i++) {
                 const img = successfulImages[i];
