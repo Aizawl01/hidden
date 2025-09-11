@@ -1,12 +1,16 @@
 
 
 
+
+
+
+
+
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// Fix: Use process.env.API_KEY directly as per the coding guidelines.
-// Initialize the Google AI client with the API key from environment variables.
+// FIX: The API key must be obtained from `process.env.API_KEY` as per the coding guidelines.
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 // The secret code to unlock the app. Share this with your followers.
@@ -249,7 +253,6 @@ const PhotoDisplay: React.FC<{ era: string, imageUrl: string, onDownload: (url: 
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            // Fix: Cast event.target to Node, as the 'contains' method expects a Node object.
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsMenuOpen(false);
         };
         document.addEventListener("mousedown", handleClickOutside);
@@ -508,17 +511,6 @@ type TemplateData = {
     styles?: string[];
 };
 
-const LOADING_MESSAGES = [
-    "Warming up the AI's creative circuits...",
-    "Teaching the model about 80s fashion...",
-    "Reticulating splines...",
-    "Consulting the digital muse...",
-    "Painting pixels with photons...",
-    "Almost there, adding finishing touches...",
-    "Generating pure awesomeness...",
-    "Compiling the retro vibes...",
-];
-
 
 const App: React.FC = () => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -544,7 +536,6 @@ const App: React.FC = () => {
     const [celebrityName, setCelebrityName] = useState('');
     const [keychainText, setKeychainText] = useState('');
     const [generationCount, setGenerationCount] = useState(3);
-    const [loadingMessage, setLoadingMessage] = useState('');
 
     const [isUnlocked, setIsUnlocked] = useState(false);
     const [accessCodeInput, setAccessCodeInput] = useState('');
@@ -573,30 +564,7 @@ const App: React.FC = () => {
         }
     }, []);
 
-    // Effect for dynamic loading messages
     useEffect(() => {
-        let interval: ReturnType<typeof setInterval> | null = null;
-        if (isLoading) {
-            setLoadingMessage(LOADING_MESSAGES[0]);
-            interval = setInterval(() => {
-                setLoadingMessage(prev => {
-                    const currentIndex = LOADING_MESSAGES.indexOf(prev);
-                    const nextIndex = (currentIndex + 1) % LOADING_MESSAGES.length;
-                    return LOADING_MESSAGES[nextIndex];
-                });
-            }, 3000);
-        } else if (interval) {
-            clearInterval(interval);
-        }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [isLoading]);
-
-    // Effect for optimizing background particle animation
-    useEffect(() => {
-        // Fix: Cast the result of getElementById to HTMLCanvasElement to resolve type errors
-        // and allow access to canvas-specific properties like `width`, `height`, and methods like `getContext`.
         const canvas = document.getElementById('background-canvas') as HTMLCanvasElement;
         if (!canvas) return;
 
@@ -604,7 +572,7 @@ const App: React.FC = () => {
         if (!ctx) return;
 
         let particles: { x: number; y: number; vx: number; vy: number; radius: number }[] = [];
-        let animationFrameId: number | null = null;
+        let animationFrameId: number;
 
         const setup = () => {
             canvas.width = window.innerWidth;
@@ -621,9 +589,8 @@ const App: React.FC = () => {
                 });
             }
         };
-        
+
         const draw = () => {
-            if (!ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             particles.forEach(p => {
@@ -659,43 +626,20 @@ const App: React.FC = () => {
             animationFrameId = requestAnimationFrame(draw);
         };
         
-        const startAnimation = () => {
-            if (!animationFrameId) {
-                draw();
-            }
-        };
-        
-        const stopAnimation = () => {
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-                animationFrameId = null;
-            }
-        };
-
-        const handleResize = () => {
-             stopAnimation();
-             setup();
-             startAnimation();
-        };
-
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                stopAnimation();
-            } else {
-                startAnimation();
-            }
-        };
-        
         setup();
-        startAnimation();
+        draw();
+        
+        const handleResize = () => {
+             cancelAnimationFrame(animationFrameId);
+             setup();
+             draw();
+        };
         
         window.addEventListener('resize', handleResize);
-        document.addEventListener('visibilitychange', handleVisibilityChange);
 
         return () => {
             window.removeEventListener('resize', handleResize);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-            stopAnimation();
+            cancelAnimationFrame(animationFrameId);
         };
     }, []);
 
@@ -1116,7 +1060,7 @@ const App: React.FC = () => {
         document.body.removeChild(link);
     };
 
-    const handleDownloadRequest = useCallback(async (imageUrl: string, era: string, ratio: string) => {
+    const handleDownloadRequest = async (imageUrl: string, era: string, ratio: string) => {
         try {
             const shouldAddLabel = !['headshots', 'eightiesMall', 'styleLookbook', 'figurines', 'mizoAttire', 'photoRestoration', 'celebrity', 'keychainCreator'].includes(template!);
             const framedImageUrl = await createSingleFramedImage(imageUrl, ratio, shouldAddLabel ? era : null);
@@ -1124,9 +1068,9 @@ const App: React.FC = () => {
         } catch (err) {
             setError(`Could not prepare that image for download.`);
         }
-    }, [template]);
+    };
 
-    const handleShareRequest = useCallback(async (imageUrl: string, era: string) => {
+    const handleShareRequest = async (imageUrl: string, era: string) => {
         if (!navigator.share) {
             setError("Sharing is not supported on your browser.");
             return;
@@ -1154,7 +1098,7 @@ const App: React.FC = () => {
                 setError("Something went wrong while trying to share.");
             }
         }
-    }, []);
+    };
     
     const handleAlbumDownloadRequest = async () => {
         if (isDownloadingAlbum) return;
@@ -1168,7 +1112,7 @@ const App: React.FC = () => {
                 return;
             }
     
-            const zip = new (window as any)['JSZip']();
+            const zip = new (window as any).JSZip();
             
             for (let i = 0; i < successfulImages.length; i++) {
                 const img = successfulImages[i];
@@ -1454,7 +1398,7 @@ const App: React.FC = () => {
                                 {(isLoading || generatedImages.length > 0) && !isSettingUp && (
                                     <div className="mt-16">
                                         <h2 className="text-3xl font-bold text-white mb-8 text-center font-orbitron">YOUR GENERATED PHOTOS</h2>
-                                        {isLoading && <div className="w-full max-w-4xl mx-auto mb-8 text-center"><div className="bg-slate-800 rounded-full h-3 overflow-hidden shadow-md"><div className="bg-gradient-to-r from-cyan-400 to-pink-500 h-3 rounded-full transition-all duration-500" style={{width: `${progress}%`}}></div></div><p className="text-slate-400 mt-4 text-sm min-h-[1.25rem]">{loadingMessage}</p></div>}
+                                        {isLoading && <div className="w-full max-w-4xl mx-auto mb-8 text-center"><div className="bg-slate-800 rounded-full h-3 overflow-hidden shadow-md"><div className="bg-gradient-to-r from-cyan-400 to-pink-500 h-3 rounded-full transition-all duration-500" style={{width: `${progress}%`}}></div></div><p className="text-slate-400 mt-4 text-sm">Please keep this window open while your photos are being generated.</p></div>}
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-8">
                                             {generatedImages.map((img, index) => {
                                                 const isPolaroid = templates[template!]?.isPolaroid ?? false;

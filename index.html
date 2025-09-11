@@ -128,7 +128,14 @@
           100% { clip-path: inset(45% 0 48% 0); }
         }
     </style>
-  <script type="importmap">
+    <script>
+      // IMPORTANT: Replace "YOUR_API_KEY_HERE" with your actual Google AI API key.
+      // NOTE: This key will be visible to anyone visiting your page.
+      // For security, it is highly recommended to create a new, restricted API key
+      // for this project and disable it if it's no longer needed.
+      window.GEMINI_API_KEY = "YOUR_API_KEY_HERE";
+    </script>
+    <script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.1.1",
@@ -146,17 +153,6 @@
     <canvas id="background-canvas"></canvas>
     <div id="root"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
-    <script>
-        // WARNING: This is NOT a secure way to handle API keys in a real application.
-        // This key is visible to anyone who visits the website. For a production app,
-        // you should use a server-side proxy to keep your API key secret.
-        // The API key below has been set with the one provided by the user.
-        window.process = {
-            env: {
-                API_KEY: "AIzaSyC4hkmqihimopHTQBZ8sZa-zbq6ZtRnnms"
-            }
-        };
-    </script>
     <!-- Use type="text/babel" to let Babel transpile the script -->
     <script type="text/babel" data-type="module" src="./index.tsx"></script>
   <script type="module" src="/index.tsx"></script>
