@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import ReactDOM from 'react-dom/client';
 import { GoogleGenAI, Modality } from '@google/genai';
 
-// Fix: Declare JSZip to inform TypeScript about the global variable from an external script.
+// Declare JSZip to inform TypeScript about the global variable from an external script.
 declare var JSZip: any;
 
-// Fix: Property 'GEMINI_API_KEY' does not exist on type 'Window & typeof globalThis'. Initialize with `process.env.API_KEY` as per guidelines.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Initialize the Google GenAI client. The API key is a placeholder that will be replaced during the build process.
+const ai = new GoogleGenAI({ apiKey: '__GEMINI_API_KEY__' });
 
 // The secret code to unlock the app. Share this with your followers.
 const ACCESS_CODE = "NANO-VILLAIN-2025";
